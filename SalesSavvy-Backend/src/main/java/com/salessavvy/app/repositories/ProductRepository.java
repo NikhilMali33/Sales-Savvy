@@ -1,0 +1,25 @@
+package com.salessavvy.app.repositories;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.salessavvy.app.app.enums.ProductStatus;
+import com.salessavvy.app.entities.Category;
+import com.salessavvy.app.entities.Product;
+
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Integer> {
+
+    List<Product> findByCategory(Category category);
+
+    List<Product> findByStatus(ProductStatus status);
+
+    List<Product> findByNameContainingIgnoreCase(String keyword);
+    
+    List<Product> findByCategoryCategoryId(Integer categoryId);
+    
+    
+
+}

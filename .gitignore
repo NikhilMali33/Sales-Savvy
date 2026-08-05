@@ -1,0 +1,42 @@
+# =========================
+# Spring Boot
+# =========================
+SalesSavvy-Backend/target/
+SalesSavvy-Backend/.classpath
+SalesSavvy-Backend/.project
+SalesSavvy-Backend/.settings/
+
+# STS Workspace
+SalesSavvy-Backend/.metadata/
+
+# Maven Wrapper Jar (optional)
+SalesSavvy-Backend/.mvn/wrapper/maven-wrapper.jar
+
+# =========================
+# React
+# =========================
+sales-savvy-frontend/node_modules/
+sales-savvy-frontend/dist/
+
+# =========================
+# IDE
+# =========================
+.vscode/
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Environment
+# =========================
+.env
+.env.*
+
+# =========================
+# OS
+# =========================
+Thumbs.db
+.DS_Store
+/.metadata/
