@@ -65,6 +65,8 @@ public class ProductImage {
 		return "ProductImage [imageId=" + imageId + ", imageUrl=" + imageUrl + ", publicId=" + publicId + ", isPrimary="
 				+ isPrimary + ", displayOrder=" + displayOrder + ", product=" + product + "]";
 	}
+	
+	 // Getters & Setters
 
 	public Integer getImageId() {
 		return imageId;
@@ -117,5 +119,5 @@ public class ProductImage {
     
     
 
-    // Getters & Setters
+   
 }

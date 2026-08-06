@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.salessavvy.app.app.enums.CategoryStatus;
 
 import jakarta.persistence.*;
@@ -36,9 +37,12 @@ public class Category {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "category",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(
+        mappedBy = "category",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private List<Product> products = new ArrayList<>();
 
     public Category() {

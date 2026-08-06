@@ -2,7 +2,6 @@ package com.salessavvy.app.config;
 
 import java.util.List;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -16,41 +15,50 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
-	
-	
+
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
-	
+
 	public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-	    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 	}
 
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
 
-        http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth.requestMatchers(
-                                "/api/auth/**",
-                                "/api/users/register"
-                        ).permitAll().anyRequest().permitAll());
-        return http.build();
-    }
+				.authorizeHttpRequests(auth -> auth
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+						// Public APIs
+						.requestMatchers("/api/auth/**", "/api/users/register", "/api/products/**",
+								"/api/categories/**")
+						.permitAll()
 
-        CorsConfiguration configuration = new CorsConfiguration();
+						// Future Admin APIs
+						.requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("*"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+						// Everything else requires authentication
+						.anyRequest().authenticated())
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        source.registerCorsConfiguration("/**", configuration);
+		return http.build();
+	}
 
-        return source;
-    }
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+
+		CorsConfiguration configuration = new CorsConfiguration();
+
+		configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+		configuration.setAllowedMethods(List.of("*"));
+		configuration.setAllowedHeaders(List.of("*"));
+		configuration.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+		source.registerCorsConfiguration("/**", configuration);
+
+		return source;
+	}
 }

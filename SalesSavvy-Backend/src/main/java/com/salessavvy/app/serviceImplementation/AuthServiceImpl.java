@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.salessavvy.app.dto.response.LoginResponseDTO;
+import com.salessavvy.app.dto.response.UserResponseDTO;
 import com.salessavvy.app.entities.JWTToken;
 import com.salessavvy.app.entities.OTPVerification;
 import com.salessavvy.app.entities.User;
@@ -145,7 +147,7 @@ public class AuthServiceImpl implements AuthService{
 	}
 	
 	@Override
-	public String verifyOtp(String username, int otp) {
+	public LoginResponseDTO verifyOtp(String username, int otp) {
 
 	    User user = userRepository.findByUsername(username)
 	            .orElseThrow(() -> new RuntimeException("User not found"));
@@ -174,9 +176,18 @@ public class AuthServiceImpl implements AuthService{
 
 	    String token = generateToken(user);
 
-	    
+	    UserResponseDTO userResponse = new UserResponseDTO(
+	            user.getUserId(),
+	            user.getUsername(),
+	            user.getEmail(),
+	            user.getRole().toString()
+	    );
 
-	    return token;
+	    return new LoginResponseDTO(
+	            "Login Successful",
+	            token,
+	            userResponse
+	    );
 	}
 	
 	@Override
