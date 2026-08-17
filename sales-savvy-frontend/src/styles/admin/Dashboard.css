@@ -1,0 +1,9 @@
+.admin-layout {
+    background: #F5F7FB;
+    min-height: 100vh;
+}
+
+.admin-content {
+    margin-left: 250px;
+    padding: 30px;
+}

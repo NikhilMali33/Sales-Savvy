@@ -4,61 +4,128 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
 
-	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-	public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-	}
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter) {
 
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
-		http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
 
-				.authorizeHttpRequests(auth -> auth
+        http
 
-						// Public APIs
-						.requestMatchers("/api/auth/**", "/api/users/register", "/api/products/**",
-								"/api/categories/**")
-						.permitAll()
+            // Disable CSRF because we are using JWT authentication
+            .csrf(csrf -> csrf.disable())
 
-						// Future Admin APIs
-						.requestMatchers("/api/admin/**").hasRole("ADMIN")
+            // Enable CORS
+            .cors(Customizer.withDefaults())
 
-						// Everything else requires authentication
-						.anyRequest().authenticated())
+            .authorizeHttpRequests(auth -> auth
 
-				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                // Allow browser preflight requests
+                .requestMatchers(
+                        HttpMethod.OPTIONS,
+                        "/**"
+                ).permitAll()
 
-		return http.build();
-	}
+                // ==========================
+                // PUBLIC APIs
+                // ==========================
 
-	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
+                .requestMatchers(
+                        "/api/auth/**",
+                        "/api/users/register",
+                        "/api/products/**",
+                        "/api/categories/**"
+                ).permitAll()
 
-		CorsConfiguration configuration = new CorsConfiguration();
+                // ==========================
+                // CART
+                // ==========================
 
-		configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-		configuration.setAllowedMethods(List.of("*"));
-		configuration.setAllowedHeaders(List.of("*"));
-		configuration.setAllowCredentials(true);
+                // Cart requires logged-in user
+                .requestMatchers("/api/cart/**")
+                .authenticated()
 
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                // ==========================
+                // ADMIN
+                // ==========================
 
-		source.registerCorsConfiguration("/**", configuration);
+                .requestMatchers("/api/admin/**")
+                .hasRole("ADMIN")
 
-		return source;
-	}
+                // ==========================
+                // EVERYTHING ELSE
+                // ==========================
+
+                .anyRequest()
+                .authenticated()
+            )
+
+            // JWT authentication
+            .addFilterBefore(
+                    jwtAuthenticationFilter,
+                    UsernamePasswordAuthenticationFilter.class
+            );
+
+        return http.build();
+    }
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration configuration =
+                new CorsConfiguration();
+
+        // React frontend
+        configuration.setAllowedOrigins(
+                List.of("http://localhost:5173")
+        );
+
+        // Allowed HTTP methods
+        configuration.setAllowedMethods(
+                List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "OPTIONS"
+                )
+        );
+
+        // Allow all request headers
+        configuration.setAllowedHeaders(
+                List.of("*")
+        );
+
+        // Required because JWT is stored in HttpOnly cookie
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration(
+                "/**",
+                configuration
+        );
+
+        return source;
+    }
 }

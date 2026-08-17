@@ -9,9 +9,9 @@ import {
     CheckCircle,
 } from "lucide-react";
 
-import loginIllustration from "../assets/images/login.svg";
-import { login, verifyOtp } from "../services/authService";
-import "../styles/auth.css";
+import loginIllustration from "../../assets/images/login.svg";
+import "../../styles/authstyle/auth.css";
+import { login, verifyOtp } from "../../services/authService";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -50,6 +50,7 @@ const Login = () => {
         e.preventDefault();
 
         try {
+
             const response = await verifyOtp({
                 username: formData.username,
                 otp: Number(otp),
@@ -57,9 +58,24 @@ const Login = () => {
 
             alert(response.data.message);
 
-            navigate("/home");
+            // Save logged-in user
+            localStorage.setItem(
+                "user",
+                JSON.stringify(response.data.user)
+            );
+
+            const role = response.data.user.role;
+
+            if (role === "ADMIN") {
+                navigate("/admin/dashboard");
+            } else {
+                navigate("/products");
+            }
+
         } catch (error) {
+
             alert(error.response?.data?.error || "Invalid OTP");
+
         }
     };
 

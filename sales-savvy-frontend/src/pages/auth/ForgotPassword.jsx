@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail } from "lucide-react";
-import loginIllustration from "../assets/images/login.svg";
-import "../styles/auth.css";
-import { forgotPassword } from "../services/authService";
-
-import { ShoppingBag} from "lucide-react";
+import { Mail, ShoppingBag } from "lucide-react";
+import loginIllustration from "../../assets/images/login.svg";
+import "../../styles/authstyle/auth.css";
+import { forgotPassword } from "../../services/authService";
 
 const ForgotPassword = () => {
 

@@ -1,7 +1,5 @@
-import "../styles/Register.css";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/auth.css";
 import {
   ShoppingBag,
   User,
@@ -12,9 +10,11 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-import registerIllustration from "../assets/images/register.svg";
-import { register } from "../services/authService";
-
+import loginIllustration from "../../assets/images/login.svg";
+import registerIllustration from "../../assets/images/register.svg";
+import "../../styles/authstyle/auth.css";
+import "../../styles/authstyle/Register.css";
+import { register } from "../../services/authService";
 function Register() {
   const navigate = useNavigate();
 

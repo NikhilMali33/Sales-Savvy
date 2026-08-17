@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingBag, Lock, Eye, EyeOff } from "lucide-react";
-import loginIllustration from "../assets/images/login.svg";
-import "../styles/auth.css";
-import { resetPassword } from "../services/authService";
+import loginIllustration from "../../assets/images/login.svg";
+import "../../styles/authstyle/auth.css";
+import { resetPassword } from "../../services/authService";
 
 const ResetPassword = () => {
 
