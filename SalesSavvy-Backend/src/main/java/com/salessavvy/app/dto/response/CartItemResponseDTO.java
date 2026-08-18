@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public class CartItemResponseDTO {
 
     private Integer cartItemId;
-
+    
     private Integer productId;
 
     private String productName;
