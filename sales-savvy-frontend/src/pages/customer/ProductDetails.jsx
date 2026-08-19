@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { getProductById } from "../../services/productService";
 
@@ -12,6 +12,7 @@ import "../../styles/customer/ProductDetails.css";
 function ProductDetails() {
 
     const { id } = useParams();
+    const navigate = useNavigate();
 
 
     // ============================================================
@@ -60,6 +61,7 @@ function ProductDetails() {
                 data
             );
 
+
             console.log(
                 "Images:",
                 data.imageUrls
@@ -77,6 +79,7 @@ function ProductDetails() {
                 setSelectedImage(
                     data.imageUrls[0]
                 );
+
             }
 
 
@@ -87,10 +90,13 @@ function ProductDetails() {
                 error
             );
 
+
             setError(
                 "Unable to load product details."
             );
+
         }
+
     };
 
 
@@ -131,6 +137,7 @@ function ProductDetails() {
         setSelectedImage(
             images[previousIndex]
         );
+
     };
 
 
@@ -156,6 +163,7 @@ function ProductDetails() {
         setSelectedImage(
             images[nextIndex]
         );
+
     };
 
 
@@ -170,6 +178,7 @@ function ProductDetails() {
             event.preventDefault();
 
             showPreviousImage();
+
         }
 
 
@@ -178,7 +187,9 @@ function ProductDetails() {
             event.preventDefault();
 
             showNextImage();
+
         }
+
     };
 
 
@@ -193,6 +204,8 @@ function ProductDetails() {
         );
 
         setMessage("");
+        setError("");
+
     };
 
 
@@ -212,6 +225,23 @@ function ProductDetails() {
         );
 
         setMessage("");
+        setError("");
+
+    };
+
+
+    // ============================================================
+    // LOGIN MESSAGE
+    // ============================================================
+
+    const showLoginMessage = (action) => {
+
+        setMessage("");
+
+        setError(
+            `Please login to ${action}.`
+        );
+
     };
 
 
@@ -259,41 +289,88 @@ function ProductDetails() {
             setMessage("");
 
 
-            const response =
-                await fetch(
-                    "http://localhost:8080/api/cart/add",
-                    {
-                        method: "POST",
+            const response = await fetch(
+                "http://localhost:8080/api/cart/add",
+                {
+                    method: "POST",
 
-                        credentials: "include",
+                    credentials: "include",
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
 
-                        body: JSON.stringify({
-                            productId:
-                                product.productId,
+                    body: JSON.stringify({
+                        productId:
+                            product.productId,
 
-                            quantity:
-                                quantity
-                        })
-                    }
+                        quantity:
+                            quantity
+                    })
+                }
+            );
+
+
+            // ====================================================
+            // READ RESPONSE
+            // ====================================================
+
+            const responseText =
+                await response.text();
+
+
+            let data = {};
+
+
+            if (responseText) {
+
+                try {
+
+                    data =
+                        JSON.parse(responseText);
+
+                } catch (parseError) {
+
+                    console.error(
+                        "Backend returned non-JSON response:",
+                        responseText
+                    );
+
+                }
+
+            }
+
+
+            // ====================================================
+            // HANDLE AUTHENTICATION ERROR
+            // ====================================================
+
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
+
+                showLoginMessage(
+                    "add products to your cart"
                 );
 
+                return;
+            }
 
-            const data =
-                await response.json();
 
+            // ====================================================
+            // HANDLE OTHER BACKEND ERRORS
+            // ====================================================
 
             if (!response.ok) {
 
                 throw new Error(
                     data.error ||
                     data.message ||
+                    responseText ||
                     "Failed to add product to cart."
                 );
+
             }
 
 
@@ -306,13 +383,7 @@ function ProductDetails() {
             );
 
 
-            /*
-             * Tell Navbar that the cart has changed.
-             *
-             * Navbar listens for this event and immediately
-             * fetches the latest cart count.
-             */
-
+            // Tell Navbar that cart changed
             window.dispatchEvent(
                 new Event("cartUpdated")
             );
@@ -331,11 +402,170 @@ function ProductDetails() {
                 "Unable to add product to cart."
             );
 
-
         } finally {
 
             setAddingToCart(false);
+
         }
+
+    };
+
+
+    // ============================================================
+    // BUY NOW
+    // ============================================================
+
+    const handleBuyNow = async () => {
+
+        if (!product) {
+            return;
+        }
+
+
+        const stock =
+            Number(product.stockQuantity) || 0;
+
+
+        if (stock <= 0) {
+
+            setError(
+                "Product is currently out of stock."
+            );
+
+            return;
+        }
+
+
+        if (quantity > stock) {
+
+            setError(
+                "Requested quantity exceeds available stock."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            setError("");
+
+            setMessage("");
+
+
+            const response = await fetch(
+                "http://localhost:8080/api/cart/add",
+                {
+                    method: "POST",
+
+                    credentials: "include",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        productId:
+                            product.productId,
+
+                        quantity:
+                            quantity
+                    })
+                }
+            );
+
+
+            // ====================================================
+            // READ RESPONSE
+            // ====================================================
+
+            const responseText =
+                await response.text();
+
+
+            let data = {};
+
+
+            if (responseText) {
+
+                try {
+
+                    data =
+                        JSON.parse(responseText);
+
+                } catch (parseError) {
+
+                    console.error(
+                        "Backend returned non-JSON response:",
+                        responseText
+                    );
+
+                }
+
+            }
+
+
+            // ====================================================
+            // HANDLE AUTHENTICATION ERROR
+            // ====================================================
+
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
+
+                showLoginMessage(
+                    "purchase this product"
+                );
+
+                return;
+            }
+
+
+            // ====================================================
+            // HANDLE OTHER BACKEND ERRORS
+            // ====================================================
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    data.message ||
+                    responseText ||
+                    "Unable to proceed with Buy Now."
+                );
+
+            }
+
+
+            // ====================================================
+            // SUCCESS
+            // ====================================================
+
+            window.dispatchEvent(
+                new Event("cartUpdated")
+            );
+
+
+            // Go directly to cart
+            navigate("/cart");
+
+
+        } catch (error) {
+
+            console.error(
+                "Buy Now error:",
+                error
+            );
+
+
+            setError(
+                error.message ||
+                "Unable to proceed with Buy Now."
+            );
+
+        }
+
     };
 
 
@@ -349,7 +579,7 @@ function ProductDetails() {
             product.discountPrice &&
             product.price &&
             Number(product.discountPrice) <
-                Number(product.price)
+            Number(product.price)
         ) {
 
             return Math.round(
@@ -361,10 +591,12 @@ function ProductDetails() {
                     Number(product.price)
                 ) * 100
             );
+
         }
 
 
         return 0;
+
     };
 
 
@@ -376,6 +608,7 @@ function ProductDetails() {
 
         return (
             <>
+
                 <Navbar />
 
                 <div
@@ -383,10 +616,14 @@ function ProductDetails() {
                     role="status"
                     aria-live="polite"
                 >
+
                     {error || "Loading..."}
+
                 </div>
+
             </>
         );
+
     }
 
 
@@ -401,7 +638,7 @@ function ProductDetails() {
     const hasDiscount =
         product.discountPrice &&
         Number(product.discountPrice) <
-            Number(product.price);
+        Number(product.price);
 
 
     // ============================================================
@@ -494,6 +731,7 @@ function ProductDetails() {
                             )}
 
                         </div>
+
                     )}
 
 
@@ -521,7 +759,9 @@ function ProductDetails() {
                                 role="img"
                                 aria-label="No product image available"
                             >
+
                                 No Image Available
+
                             </div>
 
                         )}
@@ -543,7 +783,9 @@ function ProductDetails() {
 
                                 aria-label="View previous product image"
                             >
+
                                 &#8249;
+
                             </button>
 
                         )}
@@ -565,7 +807,9 @@ function ProductDetails() {
 
                                 aria-label="View next product image"
                             >
+
                                 &#8250;
+
                             </button>
 
                         )}
@@ -582,9 +826,13 @@ function ProductDetails() {
                                 aria-live="polite"
                                 aria-atomic="true"
                             >
+
                                 {currentImageIndex + 1}
+
                                 {" / "}
+
                                 {images.length}
+
                             </div>
 
                         )}
@@ -612,7 +860,9 @@ function ProductDetails() {
                         id="product-title"
                         className="product-title"
                     >
+
                         {product.productName}
+
                     </h1>
 
 
@@ -828,7 +1078,9 @@ function ProductDetails() {
                             htmlFor="product-quantity"
                             className="quantity-label"
                         >
+
                             Quantity
+
                         </label>
 
 
@@ -853,7 +1105,9 @@ function ProductDetails() {
 
                                 aria-label="Decrease quantity"
                             >
+
                                 −
+
                             </button>
 
 
@@ -863,7 +1117,9 @@ function ProductDetails() {
                                 aria-live="polite"
                                 aria-atomic="true"
                             >
+
                                 {quantity}
+
                             </span>
 
 
@@ -885,7 +1141,9 @@ function ProductDetails() {
 
                                 aria-label="Increase quantity"
                             >
+
                                 +
+
                             </button>
 
                         </div>
@@ -926,6 +1184,26 @@ function ProductDetails() {
 
                             {error}
 
+                            {/* Login button for authentication errors */}
+
+                            {error.includes(
+                                "Please login"
+                            ) && (
+
+                                <button
+                                    type="button"
+                                    className="login-required-btn"
+                                    onClick={() =>
+                                        navigate("/")
+                                    }
+                                >
+
+                                    Login
+
+                                </button>
+
+                            )}
+
                         </div>
 
                     )}
@@ -958,9 +1236,7 @@ function ProductDetails() {
                             aria-label={
                                 addingToCart
                                     ? "Adding product to cart"
-                                    : `Add ${quantity} ${
-                                        product.productName
-                                    } to cart`
+                                    : `Add ${quantity} ${product.productName} to cart`
                             }
                         >
 
@@ -973,9 +1249,22 @@ function ProductDetails() {
 
                         <button
                             type="button"
+
                             className="buy-btn"
+
+                            onClick={
+                                handleBuyNow
+                            }
+
+                            disabled={
+                                Number(
+                                    product.stockQuantity
+                                ) <= 0
+                            }
                         >
+
                             Buy Now
+
                         </button>
 
                     </div>
@@ -985,7 +1274,9 @@ function ProductDetails() {
             </main>
 
         </>
+
     );
+
 }
 
 

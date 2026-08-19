@@ -87,3 +87,168 @@
     font-weight: 700;
 
 }
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.orders-link {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.orders-link:hover {
+    opacity: 0.85;
+}
+
+/* ============================================================
+   NAVBAR RIGHT SIDE
+   ============================================================ */
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+
+/* ============================================================
+   COMMON NAVBAR LINK
+   ============================================================ */
+
+.navbar-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: white;
+    text-decoration: none;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    transition: opacity 0.2s ease;
+}
+
+.navbar-link:hover {
+    opacity: 0.8;
+}
+
+.navbar-link-icon {
+    font-size: 22px;
+}
+
+
+/* ============================================================
+   PROFILE
+   ============================================================ */
+
+.profile-container {
+    position: relative;
+}
+
+
+.profile-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    border: none;
+    background: transparent;
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    padding: 6px 4px;
+}
+
+
+.profile-button:hover {
+    opacity: 0.8;
+}
+
+
+/* ============================================================
+   PROFILE DROPDOWN
+   ============================================================ */
+
+.profile-dropdown {
+    position: absolute;
+
+    top: calc(100% + 12px);
+    right: 0;
+
+    width: 190px;
+
+    background: white;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.18);
+
+    padding: 8px;
+
+    z-index: 1000;
+}
+
+
+/* ============================================================
+   DROPDOWN ITEMS
+   ============================================================ */
+
+.profile-dropdown-item {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 12px 14px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #17213a;
+
+    text-decoration: none;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+}
+
+
+.profile-dropdown-item:hover {
+    background: #f1f4f8;
+}
+
+
+/* ============================================================
+   LOGOUT
+   ============================================================ */
+
+.logout-item {
+    color: #dc2626;
+}
+
+
+.logout-item:hover {
+    background: #fff1f2;
+}

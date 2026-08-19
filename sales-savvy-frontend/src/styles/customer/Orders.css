@@ -1,0 +1,144 @@
+.orders-page {
+    min-height: 100vh;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+
+.orders-container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.orders-header h1 {
+    margin: 0;
+}
+
+.orders-header p {
+    margin-top: 8px;
+    color: #666;
+}
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.order-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.order-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #eee;
+}
+
+.order-card-header > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.order-label {
+    font-size: 13px;
+    color: #777;
+}
+
+.order-card-body {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+    padding-top: 20px;
+}
+
+.order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.order-info > span:first-child {
+    font-size: 13px;
+    color: #777;
+}
+
+.payment-status,
+.order-status {
+    font-weight: 600;
+}
+
+.payment-status.success {
+    color: #198754;
+}
+
+.payment-status.pending {
+    color: #d39e00;
+}
+
+.payment-status.failed {
+    color: #dc3545;
+}
+
+.order-status.confirmed,
+.order-status.delivered {
+    color: #198754;
+}
+
+.order-status.placed,
+.order-status.processing,
+.order-status.shipped {
+    color: #0d6efd;
+}
+
+.order-status.cancelled {
+    color: #dc3545;
+}
+
+.view-order-btn,
+.continue-shopping-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: #111827;
+    color: white;
+}
+
+.view-order-btn {
+    margin-left: auto;
+}
+
+.empty-orders,
+.orders-loading,
+.orders-error {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.empty-orders p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.continue-shopping-btn {
+    margin-top: 10px;
+}

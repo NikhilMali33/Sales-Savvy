@@ -10,6 +10,9 @@ import ProductList from "./pages/customer/ProductList";
 import ProductDetails from "./pages/customer/ProductDetails";
 import AddProduct from "./pages/admin/AddProduct";
 import Cart from "./pages/customer/Cart";
+import CustomerOrders from "./pages/customer/Order";
+import OrderDetails from "./pages/customer/OrderDetails";
+import Profile from "./pages/customer/Profile";
 
 // Admin Pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -39,6 +42,10 @@ function App() {
         <Route path="/products" element={<ProductList />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/orders" element={<CustomerOrders />} />
+        <Route path="/orders/:orderId" element={<OrderDetails />} />
+        <Route path="/profile" element={<Profile />} />
+        
 
         {/* Admin */}
 

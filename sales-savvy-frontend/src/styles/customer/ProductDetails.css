@@ -924,3 +924,29 @@
         width: 100%;
     }
 }
+
+.login-required-btn {
+    display: inline-block;
+
+    margin-left: 12px;
+    margin-top: 8px;
+
+    padding: 7px 16px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.login-required-btn:hover {
+    background: #1d4ed8;
+}

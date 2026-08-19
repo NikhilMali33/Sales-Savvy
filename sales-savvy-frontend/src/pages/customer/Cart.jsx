@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -17,6 +18,8 @@ import {
     removeCartItem,
     clearCart
 } from "../../services/cartService";
+
+import { createPaymentOrder } from "../../services/paymentService";
 
 import "../../styles/customer/Cart.css";
 
@@ -208,6 +211,201 @@ function Cart() {
                 "Unable to clear cart"
             );
 
+        }
+    };
+
+
+    // ============================================================
+    // RAZORPAY CHECKOUT
+    // ============================================================
+
+    const handleCheckout = async () => {
+
+        try {
+
+            // ----------------------------------------------------
+            // STEP 1: Create Sales Savvy Order
+            // ----------------------------------------------------
+
+            const orderResponse = await axios.post(
+                "http://localhost:8080/api/orders",
+                {},
+                {
+                    withCredentials: true
+                }
+            );
+
+            const salesSavvyOrder = orderResponse.data;
+
+            console.log(
+                "Sales Savvy Order:",
+                salesSavvyOrder
+            );
+
+
+            // ----------------------------------------------------
+            // STEP 2: Create Razorpay Order
+            // ----------------------------------------------------
+
+            const paymentResponse =
+                await createPaymentOrder(
+                    salesSavvyOrder.orderId
+                );
+
+            const paymentData =
+                paymentResponse.data;
+
+            console.log(
+                "Razorpay Order:",
+                paymentData
+            );
+
+
+            // ----------------------------------------------------
+            // STEP 3: Check Razorpay Checkout Script
+            // ----------------------------------------------------
+
+            if (!window.Razorpay) {
+
+                alert(
+                    "Razorpay Checkout is not loaded. Please refresh the page."
+                );
+
+                return;
+            }
+
+
+            // ----------------------------------------------------
+            // STEP 4: Razorpay Checkout Options
+            // ----------------------------------------------------
+
+            const options = {
+
+                key: paymentData.keyId,
+
+                amount: paymentData.amount,
+
+                currency: paymentData.currency,
+
+                name: "Sales Savvy",
+
+                description:
+                    `Payment for Order ${salesSavvyOrder.orderId}`,
+
+                order_id:
+                    paymentData.razorpayOrderId,
+
+
+                // ------------------------------------------------
+                // PAYMENT SUCCESS
+                // ------------------------------------------------
+
+                handler: async function (response) {
+
+                    console.log(
+                        "Razorpay Payment Response:",
+                        response
+                    );
+
+                    try {
+
+                        // ----------------------------------------
+                        // STEP 5: Verify payment with backend
+                        // ----------------------------------------
+
+                        await axios.post(
+                            "http://localhost:8080/api/payment/verify",
+                            {
+                                orderId:
+                                    salesSavvyOrder.orderId,
+
+                                razorpayOrderId:
+                                    response.razorpay_order_id,
+
+                                razorpayPaymentId:
+                                    response.razorpay_payment_id,
+
+                                razorpaySignature:
+                                    response.razorpay_signature
+                            },
+                            {
+                                withCredentials: true
+                            }
+                        );
+
+
+                        // ----------------------------------------
+                        // Payment verified
+                        // ----------------------------------------
+
+                        alert(
+                            "Payment successful! Your order has been confirmed."
+                        );
+
+
+                        // Refresh cart
+                        await fetchCart();
+
+                        // Update Navbar cart count
+                        notifyCartUpdated();
+
+                    } catch (error) {
+
+                        console.error(
+                            "Payment verification failed:",
+                            error
+                        );
+
+                        alert(
+                            error.response?.data?.message ||
+                            error.response?.data?.error ||
+                            "Payment verification failed."
+                        );
+                    }
+                },
+
+
+                // ------------------------------------------------
+                // PREFILL
+                // ------------------------------------------------
+
+                prefill: {
+                    name: "",
+                    email: ""
+                },
+
+
+                // ------------------------------------------------
+                // THEME
+                // ------------------------------------------------
+
+                theme: {
+                    color: "#3399cc"
+                }
+            };
+
+
+            // ----------------------------------------------------
+            // STEP 6: Open Razorpay
+            // ----------------------------------------------------
+
+            const razorpay =
+                new window.Razorpay(options);
+
+            razorpay.open();
+
+        } catch (error) {
+
+            console.error(
+                "Checkout Error:",
+                error
+            );
+
+            alert(
+                error.response?.data?.message ||
+                error.response?.data?.error ||
+                "Unable to start checkout"
+            );
         }
     };
 
@@ -631,10 +829,7 @@ function Cart() {
                         <button
                             className="checkout-btn"
                             type="button"
-                            onClick={() =>
-                                alert(
-                                    "Checkout will be implemented next."
-                                )
+                            onClick={() => handleCheckout()
                             }
                         >
                             Proceed to Checkout
