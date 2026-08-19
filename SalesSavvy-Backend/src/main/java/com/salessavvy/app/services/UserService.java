@@ -6,5 +6,7 @@ public interface UserService {
 	
 	public User registerUser(User user);
 	
+	 User findByUsername(String username);
+	
 
 }

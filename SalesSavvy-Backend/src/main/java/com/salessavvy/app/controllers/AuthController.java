@@ -124,8 +124,21 @@ public class AuthController {
         );
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "Auth Controller";
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(Map.of(
+                        "message", "Logged out successfully"
+                ));
     }
 }

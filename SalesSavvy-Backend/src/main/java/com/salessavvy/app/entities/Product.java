@@ -8,7 +8,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.salessavvy.app.app.enums.ProductStatus;
+import com.salessavvy.app.enums.ProductStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

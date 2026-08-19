@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.salessavvy.app.app.enums.ProductStatus;
+import com.salessavvy.app.enums.ProductStatus;
 
 public class ProductRequestDTO {
 

@@ -3,7 +3,7 @@ package com.salessavvy.app.dto.response;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.salessavvy.app.app.enums.ProductStatus;
+import com.salessavvy.app.enums.ProductStatus;
 
 public class ProductResponseDTO {
 

@@ -1,4 +1,4 @@
-package com.salessavvy.app.app.enums;
+package com.salessavvy.app.enums;
 
 public enum CategoryStatus {
 

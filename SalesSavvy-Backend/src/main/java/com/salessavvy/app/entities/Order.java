@@ -8,7 +8,8 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.salessavvy.app.app.enums.OrderStatus;
+import com.salessavvy.app.enums.OrderStatus;
+import com.salessavvy.app.enums.PaymentStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -53,8 +54,22 @@ public class Order {
         name = "status"
     )
     private OrderStatus status =
-            OrderStatus.PENDING;
+            OrderStatus.PLACED;
 
+    
+    @Enumerated(EnumType.STRING)
+    @Column(
+        name = "payment_status",
+        nullable = false
+    )
+    private PaymentStatus paymentStatus =
+            PaymentStatus.PENDING;
+    
+    @Column(name = "razorpay_order_id")
+    private String razorpayOrderId;
+
+    @Column(name = "razorpay_payment_id")
+    private String razorpayPaymentId;
 
     @CreationTimestamp
     @Column(
@@ -148,6 +163,33 @@ public class Order {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+    
+    
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+    
+    
+    public String getRazorpayOrderId() {
+        return razorpayOrderId;
+    }
+
+    public void setRazorpayOrderId(String razorpayOrderId) {
+        this.razorpayOrderId = razorpayOrderId;
+    }
+
+
+    public String getRazorpayPaymentId() {
+        return razorpayPaymentId;
+    }
+
+    public void setRazorpayPaymentId(String razorpayPaymentId) {
+        this.razorpayPaymentId = razorpayPaymentId;
     }
 
 

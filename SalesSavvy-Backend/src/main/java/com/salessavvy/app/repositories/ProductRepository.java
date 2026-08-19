@@ -6,9 +6,9 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.salessavvy.app.app.enums.ProductStatus;
 import com.salessavvy.app.entities.Category;
 import com.salessavvy.app.entities.Product;
+import com.salessavvy.app.enums.ProductStatus;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {

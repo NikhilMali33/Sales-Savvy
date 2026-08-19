@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.salessavvy.app.app.enums.OrderStatus;
+import com.salessavvy.app.enums.OrderStatus;
+import com.salessavvy.app.enums.PaymentStatus;
 
 public class OrderResponseDTO {
 
@@ -14,14 +15,24 @@ public class OrderResponseDTO {
 
     private OrderStatus status;
 
+    private PaymentStatus paymentStatus;
+
     private LocalDateTime createdAt;
 
     private List<OrderItemResponseDTO> items;
 
 
+    // ============================================================
+    // CONSTRUCTOR
+    // ============================================================
+
     public OrderResponseDTO() {
     }
 
+
+    // ============================================================
+    // GETTERS & SETTERS
+    // ============================================================
 
     public String getOrderId() {
         return orderId;
@@ -47,6 +58,15 @@ public class OrderResponseDTO {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
 

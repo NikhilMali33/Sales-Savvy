@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.salessavvy.app.app.enums.CategoryStatus;
+import com.salessavvy.app.enums.CategoryStatus;
 
 import jakarta.persistence.*;
 

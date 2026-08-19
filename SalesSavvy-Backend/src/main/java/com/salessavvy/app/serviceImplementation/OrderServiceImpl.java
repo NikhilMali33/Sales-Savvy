@@ -10,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.salessavvy.app.app.enums.OrderStatus;
 import com.salessavvy.app.dto.request.CreateOrderRequest;
 import com.salessavvy.app.dto.response.OrderItemResponseDTO;
 import com.salessavvy.app.dto.response.OrderResponseDTO;
@@ -19,8 +18,10 @@ import com.salessavvy.app.entities.Order;
 import com.salessavvy.app.entities.OrderItem;
 import com.salessavvy.app.entities.Product;
 import com.salessavvy.app.entities.User;
+import com.salessavvy.app.enums.OrderStatus;
 import com.salessavvy.app.repositories.CartItemRepository;
 import com.salessavvy.app.repositories.OrderRepository;
+import com.salessavvy.app.repositories.ProductRepository;
 import com.salessavvy.app.repositories.UserRepository;
 import com.salessavvy.app.services.OrderService;
 
@@ -31,15 +32,23 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+
+
+    // ============================================================
+    // CONSTRUCTOR
+    // ============================================================
 
     public OrderServiceImpl(
             OrderRepository orderRepository,
             CartItemRepository cartItemRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            ProductRepository productRepository) {
 
         this.orderRepository = orderRepository;
         this.cartItemRepository = cartItemRepository;
         this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 
 
@@ -63,7 +72,8 @@ public class OrderServiceImpl implements OrderService {
 
         String username = authentication.getName();
 
-        return userRepository.findByUsername(username)
+        return userRepository
+                .findByUsername(username)
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Logged-in user not found"));
@@ -88,7 +98,6 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException(
                     "Cannot create order because cart is empty");
         }
-
 
         BigDecimal orderTotal =
                 BigDecimal.ZERO;
@@ -126,13 +135,18 @@ public class OrderServiceImpl implements OrderService {
             // Check stock
             // ----------------------------------------------------
 
-            if (product.getStock() <= 0) {
+            if (product.getStock() == null ||
+                    product.getStock() <= 0) {
 
                 throw new RuntimeException(
                         "Product is out of stock: "
                                 + product.getName());
             }
 
+
+            // ----------------------------------------------------
+            // Check requested quantity
+            // ----------------------------------------------------
 
             if (cartItem.getQuantity() >
                     product.getStock()) {
@@ -187,7 +201,6 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setTotalPrice(
                     itemTotal);
 
-
             orderItems.add(orderItem);
 
 
@@ -197,6 +210,17 @@ public class OrderServiceImpl implements OrderService {
 
             orderTotal =
                     orderTotal.add(itemTotal);
+
+
+            // ----------------------------------------------------
+            // REDUCE PRODUCT STOCK
+            // ----------------------------------------------------
+
+            product.setStock(
+                    product.getStock()
+                            - cartItem.getQuantity());
+
+            productRepository.save(product);
         }
 
 
@@ -211,7 +235,6 @@ public class OrderServiceImpl implements OrderService {
                         .substring(0, 8)
                         .toUpperCase();
 
-
         Order order =
                 new Order();
 
@@ -219,19 +242,28 @@ public class OrderServiceImpl implements OrderService {
 
         order.setUser(user);
 
-        order.setTotalAmount(
-                orderTotal);
+        order.setTotalAmount(orderTotal);
+
+
+        // --------------------------------------------------------
+        // Order lifecycle starts at PLACED
+        // --------------------------------------------------------
 
         order.setStatus(
-                OrderStatus.PENDING);
+                OrderStatus.PLACED);
+
+
+        // --------------------------------------------------------
+        // Payment status remains PENDING
+        // Order.java initializes it as PENDING
+        // --------------------------------------------------------
 
 
         // ========================================================
         // CONNECT ORDER ITEMS TO ORDER
         // ========================================================
 
-        for (OrderItem orderItem :
-                orderItems) {
+        for (OrderItem orderItem : orderItems) {
 
             orderItem.setOrder(order);
         }
@@ -270,7 +302,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<OrderResponseDTO> getMyOrders() {
 
-        User user = getLoggedInUser();
+        User user =
+                getLoggedInUser();
 
         List<Order> orders =
                 orderRepository.findByUser(user);
@@ -297,7 +330,8 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDTO getMyOrder(
             String orderId) {
 
-        User user = getLoggedInUser();
+        User user =
+                getLoggedInUser();
 
         Order order =
                 orderRepository
@@ -320,7 +354,13 @@ public class OrderServiceImpl implements OrderService {
     public void cancelOrder(
             String orderId) {
 
-        User user = getLoggedInUser();
+        User user =
+                getLoggedInUser();
+
+
+        // --------------------------------------------------------
+        // Find order
+        // --------------------------------------------------------
 
         Order order =
                 orderRepository
@@ -332,16 +372,57 @@ public class OrderServiceImpl implements OrderService {
                                         "Order not found"));
 
 
+        // --------------------------------------------------------
+        // Only PLACED orders can be cancelled
+        // --------------------------------------------------------
+
         if (order.getStatus() !=
-                OrderStatus.PENDING) {
+                OrderStatus.PLACED) {
 
             throw new RuntimeException(
-                    "Only pending orders can be cancelled");
+                    "Order cannot be cancelled at this stage");
         }
 
 
+        // ========================================================
+        // RESTORE PRODUCT STOCK
+        // ========================================================
+
+        if (order.getOrderItems() != null) {
+
+            for (OrderItem orderItem :
+                    order.getOrderItems()) {
+
+                Product product =
+                        orderItem.getProduct();
+
+                if (product != null) {
+
+                    int currentStock =
+                            product.getStock() == null
+                                    ? 0
+                                    : product.getStock();
+
+                    int restoredStock =
+                            currentStock
+                                    + orderItem.getQuantity();
+
+                    product.setStock(
+                            restoredStock);
+
+                    productRepository.save(
+                            product);
+                }
+            }
+        }
+
+
+        // ========================================================
+        // MARK ORDER AS CANCELLED
+        // ========================================================
+
         order.setStatus(
-                OrderStatus.FAILED);
+                OrderStatus.CANCELLED);
 
         orderRepository.save(order);
     }
@@ -357,6 +438,11 @@ public class OrderServiceImpl implements OrderService {
         OrderResponseDTO dto =
                 new OrderResponseDTO();
 
+
+        // --------------------------------------------------------
+        // Basic order information
+        // --------------------------------------------------------
+
         dto.setOrderId(
                 order.getOrderId());
 
@@ -366,13 +452,19 @@ public class OrderServiceImpl implements OrderService {
         dto.setStatus(
                 order.getStatus());
 
+        dto.setPaymentStatus(
+                order.getPaymentStatus());
+
         dto.setCreatedAt(
                 order.getCreatedAt());
 
 
+        // ========================================================
+        // ORDER ITEMS
+        // ========================================================
+
         List<OrderItemResponseDTO> itemResponses =
                 new ArrayList<>();
-
 
         if (order.getOrderItems() != null) {
 
@@ -382,32 +474,42 @@ public class OrderServiceImpl implements OrderService {
                 OrderItemResponseDTO itemDTO =
                         new OrderItemResponseDTO();
 
+
                 itemDTO.setId(
                         item.getId());
+
 
                 itemDTO.setProductId(
                         item.getProduct()
                                 .getProductId());
 
+
                 itemDTO.setProductName(
                         item.getProduct()
                                 .getName());
 
+
                 itemDTO.setQuantity(
                         item.getQuantity());
+
 
                 itemDTO.setPricePerUnit(
                         item.getPricePerUnit());
 
+
                 itemDTO.setTotalPrice(
                         item.getTotalPrice());
 
-                itemResponses.add(itemDTO);
+
+                itemResponses.add(
+                        itemDTO);
             }
         }
 
 
-        dto.setItems(itemResponses);
+        dto.setItems(
+                itemResponses);
+
 
         return dto;
     }

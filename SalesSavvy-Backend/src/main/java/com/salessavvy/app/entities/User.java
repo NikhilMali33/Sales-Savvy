@@ -2,7 +2,7 @@ package com.salessavvy.app.entities;
 
 import java.time.LocalDateTime;
 
-import com.salessavvy.app.app.enums.Role;
+import com.salessavvy.app.enums.Role;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -20,50 +20,70 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	private final AuthServiceImpl authServiceImpl;
+    private final AuthServiceImpl authServiceImpl;
 
-	public JwtAuthenticationFilter(AuthServiceImpl authServiceImpl) {
-		this.authServiceImpl = authServiceImpl;
-	}
+    public JwtAuthenticationFilter(AuthServiceImpl authServiceImpl) {
+        this.authServiceImpl = authServiceImpl;
+    }
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain)
+            throws ServletException, IOException {
 
-		System.out.println("JWT FILTER -> " + request.getMethod() + " " + request.getRequestURI());
+        String token = getJwtFromCookie(request);
 
-		String token = getJwtFromCookie(request);
+        if (token != null && authServiceImpl.validateToken(token)) {
 
-		if (token != null && authServiceImpl.validateToken(token)) {
+            String username = authServiceImpl.extractUsername(token);
 
-			String username = authServiceImpl.extractUsername(token);
+            UserDetails userDetails =
+                    authServiceImpl.loadUserByUsername(username);
 
-			UserDetails userDetails = authServiceImpl.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
 
-			UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
-					null, userDetails.getAuthorities());
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource()
+                            .buildDetails(request)
+            );
 
-			authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(authentication);
+        }
 
-			SecurityContextHolder.getContext().setAuthentication(authentication);
+        filterChain.doFilter(request, response);
+    }
+    
+    private String getJwtFromCookie(
+            HttpServletRequest request) {
 
-//			filterChain.doFilter(request, response);
-		}
-		filterChain.doFilter(request, response);
-	}
+        if (request.getCookies() == null) {
+            System.out.println(
+                    "JWT COOKIE -> NO COOKIES RECEIVED"
+            );
+            return null;
+        }
 
-	private String getJwtFromCookie(HttpServletRequest request) {
+        for (Cookie cookie : request.getCookies()) {
 
-		if (request.getCookies() == null)
-			return null;
+            System.out.println(
+                    "COOKIE RECEIVED -> "
+                            + cookie.getName()
+            );
 
-		for (Cookie cookie : request.getCookies()) {
+            if ("jwt".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
 
-			if ("jwt".equals(cookie.getName())) {
-				return cookie.getValue();
-			}
-		}
-
-		return null;
-	}
+        return null;
+    }
 }

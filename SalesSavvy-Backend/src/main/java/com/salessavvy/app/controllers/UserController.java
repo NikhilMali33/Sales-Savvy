@@ -2,16 +2,20 @@ package com.salessavvy.app.controllers;
 
 import java.util.Map;
 
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 
-import com.salessavvy.app.app.enums.Role;
 import com.salessavvy.app.dto.response.UserResponseDTO;
 import com.salessavvy.app.entities.User;
+import com.salessavvy.app.enums.Role;
 import com.salessavvy.app.serviceImplementation.UserServiceImpl;
 import com.salessavvy.app.services.UserService;
 
@@ -43,5 +47,52 @@ public class UserController {
 		
 	}
 	
+	@GetMapping("/profile")
+	public ResponseEntity<?> getMyProfile() {
+
+	    try {
+
+	        Authentication authentication =
+	                SecurityContextHolder
+	                        .getContext()
+	                        .getAuthentication();
+
+	        if (authentication == null ||
+	                !authentication.isAuthenticated()) {
+
+	            return ResponseEntity
+	                    .status(401)
+	                    .body(Map.of(
+	                            "error",
+	                            "User is not authenticated"
+	                    ));
+	        }
+
+	        String username =
+	                authentication.getName();
+
+	        User user =
+	                service.findByUsername(username);
+
+	        UserResponseDTO response =
+	                new UserResponseDTO(
+	                        user.getUserId(),
+	                        user.getUsername(),
+	                        user.getEmail(),
+	                        user.getRole().toString()
+	                );
+
+	        return ResponseEntity.ok(response);
+
+	    } catch (RuntimeException e) {
+
+	        return ResponseEntity
+	                .badRequest()
+	                .body(Map.of(
+	                        "error",
+	                        e.getMessage()
+	                ));
+	    }
+	}	
 
 }
