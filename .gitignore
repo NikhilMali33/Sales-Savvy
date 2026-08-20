@@ -33,6 +33,7 @@ sales-savvy-frontend/dist/
 # =========================
 .env
 .env.*
+!.env.example
 
 # =========================
 # OS
