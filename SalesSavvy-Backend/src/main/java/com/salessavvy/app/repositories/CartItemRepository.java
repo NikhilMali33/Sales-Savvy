@@ -17,17 +17,14 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     List<CartItem> findByUser(User user);
 
     // Check whether the product is already in the user's cart
-    Optional<CartItem> findByUserAndProduct(
-            User user,
-            Product product
-    );
+    Optional<CartItem> findByUserAndProduct(User user, Product product);
 
     // Find a specific cart item belonging to the logged-in user
-    Optional<CartItem> findByIdAndUser(
-            Integer id,
-            User user
-    );
+    Optional<CartItem> findByIdAndUser(Integer id, User user);
 
     // Clear the user's entire cart
     void deleteByUser(User user);
+
+    // Remove only a specific product from the user's cart
+    void deleteByUserAndProduct(User user, Product product);
 }

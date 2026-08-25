@@ -1,0 +1,161 @@
+.admin-navbar {
+    min-height: 70px;
+    background: #0f172a;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 40px;
+
+    gap: 35px;
+
+    color: white;
+
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+   LOGO
+   ============================================================ */
+
+.admin-navbar-logo {
+    color: white;
+    text-decoration: none;
+
+    font-size: 22px;
+    font-weight: 700;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    white-space: nowrap;
+}
+
+.admin-navbar-logo span {
+    font-size: 12px;
+
+    background: #2563eb;
+
+    padding: 3px 7px;
+
+    border-radius: 5px;
+
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   NAVIGATION LINKS
+   ============================================================ */
+
+.admin-navbar-links {
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    flex: 1;
+}
+
+.admin-navbar-links a {
+
+    color: #cbd5e1;
+
+    text-decoration: none;
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 10px 13px;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+
+    transition: 0.2s;
+}
+
+.admin-navbar-links a:hover {
+
+    background: #1e293b;
+
+    color: white;
+}
+
+
+/* ============================================================
+   LOGOUT
+   ============================================================ */
+
+.admin-logout-btn {
+
+    border: none;
+
+    background: #1e293b;
+
+    color: #cbd5e1;
+
+    padding: 10px 15px;
+
+    border-radius: 7px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    transition: 0.2s;
+}
+
+.admin-logout-btn:hover {
+
+    background: #dc2626;
+
+    color: white;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+    .admin-navbar {
+
+        padding: 10px 20px;
+
+        flex-wrap: wrap;
+
+        gap: 10px;
+    }
+
+    .admin-navbar-links {
+
+        order: 3;
+
+        width: 100%;
+
+        overflow-x: auto;
+    }
+
+    .admin-navbar-links a {
+
+        white-space: nowrap;
+    }
+
+    .admin-logout-btn {
+
+        margin-left: auto;
+    }
+}

@@ -10,9 +10,11 @@ import com.salessavvy.app.entities.User;
 
 public interface OrderRepository extends JpaRepository<Order, String> {
 
-    List<Order> findByUser(User user);
+	 List<Order> findByUserOrderByCreatedAtDesc(User user);
 
-    Optional<Order> findByOrderIdAndUser(
-            String orderId,
-            User user);
+    Optional<Order> findByOrderIdAndUser(String orderId, User user);
+   
+    List<Order> findAllByOrderByCreatedAtDesc();
+    
+    
 }

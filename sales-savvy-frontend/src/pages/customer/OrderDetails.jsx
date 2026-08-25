@@ -7,7 +7,8 @@ import {
     CheckCircle,
     Clock,
     XCircle,
-    Ban
+    Ban,
+    RefreshCw
 } from "lucide-react";
 
 import Navbar from "../../components/layout/Navbar";
@@ -15,6 +16,11 @@ import {
     getMyOrder,
     cancelOrder
 } from "../../services/orderService";
+
+import {
+    createPaymentOrder,
+    verifyPayment
+} from "../../services/paymentService";
 
 import "../../styles/customer/OrderDetails.css";
 
@@ -26,7 +32,12 @@ const OrderDetails = () => {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [cancelling, setCancelling] = useState(false);
+
+    const [cancelling, setCancelling] =
+        useState(false);
+
+    const [retryingPayment, setRetryingPayment] =
+        useState(false);
 
 
     // ============================================================
@@ -71,6 +82,224 @@ const OrderDetails = () => {
 
 
     // ============================================================
+    // RETRY PAYMENT
+    // ============================================================
+
+    const handleRetryPayment = async () => {
+
+        try {
+
+            setRetryingPayment(true);
+            setError("");
+
+
+            // ----------------------------------------------------
+            // STEP 1: Create / reuse Razorpay order
+            // ----------------------------------------------------
+
+            const paymentResponse =
+                await createPaymentOrder(orderId);
+
+            const paymentData =
+                paymentResponse.data;
+
+
+            // ----------------------------------------------------
+            // STEP 2: Check Razorpay script
+            // ----------------------------------------------------
+
+            if (!window.Razorpay) {
+
+                setError(
+                    "Razorpay Checkout is not loaded. Please refresh the page."
+                );
+
+                setRetryingPayment(false);
+
+                return;
+            }
+
+
+            // ----------------------------------------------------
+            // STEP 3: Razorpay options
+            // ----------------------------------------------------
+
+            const options = {
+
+                key: paymentData.keyId,
+
+                amount: paymentData.amount,
+
+                currency: paymentData.currency,
+
+                name: "Sales Savvy",
+
+                description:
+                    `Payment for Order ${orderId}`,
+
+                order_id:
+                    paymentData.razorpayOrderId,
+
+
+                // ------------------------------------------------
+                // PAYMENT SUCCESS
+                // ------------------------------------------------
+
+                handler: async function (response) {
+
+                    try {
+
+                        // ----------------------------------------
+                        // Verify payment with backend
+                        // ----------------------------------------
+
+                        await verifyPayment({
+
+                            orderId:
+                                orderId,
+
+                            razorpayOrderId:
+                                response.razorpay_order_id,
+
+                            razorpayPaymentId:
+                                response.razorpay_payment_id,
+
+                            razorpaySignature:
+                                response.razorpay_signature
+                        });
+
+
+                        // ----------------------------------------
+                        // Payment successful
+                        // ----------------------------------------
+
+                        const updatedOrderResponse =
+                            await getMyOrder(orderId);
+
+                        setOrder(
+                            updatedOrderResponse.data
+                        );
+
+
+                        // Update cart count in Navbar
+                        window.dispatchEvent(
+                            new Event("cartUpdated")
+                        );
+
+
+                        alert(
+                            "Payment successful! Your order has been confirmed."
+                        );
+
+                    } catch (err) {
+
+                        console.error(
+                            "Payment verification failed:",
+                            err
+                        );
+
+                        setError(
+                            err.response?.data?.message ||
+                            err.response?.data?.error ||
+                            "Payment verification failed."
+                        );
+
+                    } finally {
+
+                        setRetryingPayment(false);
+                    }
+                },
+
+
+                // ------------------------------------------------
+                // PAYMENT MODAL CLOSED
+                // ------------------------------------------------
+
+                modal: {
+
+                    ondismiss: function () {
+
+                        setRetryingPayment(false);
+
+                        setError(
+                            "Payment was cancelled. Your order is still pending."
+                        );
+                    }
+                },
+
+
+                // ------------------------------------------------
+                // PREFILL
+                // ------------------------------------------------
+
+                prefill: {
+                    name: "",
+                    email: ""
+                },
+
+
+                // ------------------------------------------------
+                // THEME
+                // ------------------------------------------------
+
+                theme: {
+                    color: "#3399cc"
+                }
+            };
+
+
+            // ----------------------------------------------------
+            // STEP 4: Open Razorpay
+            // ----------------------------------------------------
+
+            const razorpay =
+                new window.Razorpay(options);
+
+
+            // ----------------------------------------------------
+            // Handle Razorpay payment failure
+            // ----------------------------------------------------
+
+            razorpay.on(
+                "payment.failed",
+                function (response) {
+
+                    console.error(
+                        "Razorpay payment failed:",
+                        response
+                    );
+
+                    setRetryingPayment(false);
+
+                    setError(
+                        response.error?.description ||
+                        "Payment failed. You can try again."
+                    );
+                }
+            );
+
+
+            razorpay.open();
+
+        } catch (err) {
+
+            console.error(
+                "Retry payment failed:",
+                err
+            );
+
+            setRetryingPayment(false);
+
+            setError(
+                err.response?.data?.message ||
+                err.response?.data?.error ||
+                "Unable to start payment. Please try again."
+            );
+        }
+    };
+
+
+    // ============================================================
     // CANCEL ORDER
     // ============================================================
 
@@ -91,7 +320,6 @@ const OrderDetails = () => {
 
             await cancelOrder(orderId);
 
-            // Update the page immediately
             setOrder((previousOrder) => ({
                 ...previousOrder,
                 status: "CANCELLED"
@@ -214,7 +442,16 @@ const OrderDetails = () => {
 
     const canCancel =
         order.status === "PLACED" &&
-        order.paymentStatus === "PENDING";
+        order.paymentStatus !== "SUCCESS";
+
+
+    // ============================================================
+    // CAN RETRY PAYMENT?
+    // ============================================================
+
+    const canRetryPayment =
+        order.status === "PLACED" &&
+        order.paymentStatus !== "SUCCESS";
 
 
     // ============================================================
@@ -235,9 +472,11 @@ const OrderDetails = () => {
                         to="/orders"
                         className="back-orders-link"
                     >
+
                         <ArrowLeft size={18} />
 
                         Back to My Orders
+
                     </Link>
 
 
@@ -336,9 +575,11 @@ const OrderDetails = () => {
                                     order.paymentStatus
                                 ).toLowerCase()}`}
                             >
+
                                 {getPaymentIcon()}
 
                                 {order.paymentStatus}
+
                             </strong>
 
                         </div>
@@ -351,11 +592,13 @@ const OrderDetails = () => {
                             </span>
 
                             <strong className="detail-total">
+
                                 ₹{Number(
                                     order.totalAmount
                                 ).toLocaleString(
                                     "en-IN"
                                 )}
+
                             </strong>
 
                         </div>
@@ -421,11 +664,13 @@ const OrderDetails = () => {
                                         </span>
 
                                         <strong>
+
                                             ₹{Number(
                                                 item.pricePerUnit
                                             ).toLocaleString(
                                                 "en-IN"
                                             )}
+
                                         </strong>
 
                                     </div>
@@ -438,11 +683,13 @@ const OrderDetails = () => {
                                         </span>
 
                                         <strong>
+
                                             ₹{Number(
                                                 item.totalPrice
                                             ).toLocaleString(
                                                 "en-IN"
                                             )}
+
                                         </strong>
 
                                     </div>
@@ -463,11 +710,13 @@ const OrderDetails = () => {
                             </span>
 
                             <strong>
+
                                 ₹{Number(
                                     order.totalAmount
                                 ).toLocaleString(
                                     "en-IN"
                                 )}
+
                             </strong>
 
                         </div>
@@ -508,6 +757,54 @@ const OrderDetails = () => {
                     </div>
 
 
+                    {/* RETRY PAYMENT */}
+
+                    {canRetryPayment && (
+
+                        <div className="retry-payment-card">
+
+                            <div>
+
+                                <h3>
+                                    Payment is pending
+                                </h3>
+
+                                <p>
+                                    Your order has been created,
+                                    but payment has not been completed.
+                                    You can retry the payment.
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                className="retry-payment-btn"
+                                onClick={handleRetryPayment}
+                                disabled={retryingPayment}
+                            >
+
+                                <RefreshCw
+                                    size={18}
+                                    className={
+                                        retryingPayment
+                                            ? "retry-spinner"
+                                            : ""
+                                    }
+                                />
+
+                                {retryingPayment
+                                    ? "Opening Payment..."
+                                    : "Retry Payment"}
+
+                            </button>
+
+                        </div>
+
+                    )}
+
+
                     {/* CANCEL ORDER */}
 
                     {canCancel && (
@@ -532,7 +829,10 @@ const OrderDetails = () => {
                                 type="button"
                                 className="cancel-order-btn"
                                 onClick={handleCancelOrder}
-                                disabled={cancelling}
+                                disabled={
+                                    cancelling ||
+                                    retryingPayment
+                                }
                             >
 
                                 <Ban size={18} />

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { addProduct } from "../../services/adminProductService";
+import { addProduct } from "../../services/adminService";
 import { getAllCategories } from "../../services/categoryService";
 
 import "../../styles/admin/AddProduct.css";

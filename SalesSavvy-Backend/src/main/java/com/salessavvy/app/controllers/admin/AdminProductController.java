@@ -23,44 +23,34 @@ public class AdminProductController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ProductResponseDTO> addProduct(
-            @ModelAttribute ProductRequestDTO request)
+    public ResponseEntity<ProductResponseDTO> addProduct(@ModelAttribute ProductRequestDTO request)
             throws IOException {
 
-        return ResponseEntity.ok(
-                adminProductService.addProduct(request));
+        return ResponseEntity.ok(adminProductService.addProduct(request));
     }
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
 
-        return ResponseEntity.ok(
-                adminProductService.getAllProducts());
+        return ResponseEntity.ok(adminProductService.getAllProducts());
     }
 
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponseDTO> getProductById(
             @PathVariable Integer productId) {
 
-        return ResponseEntity.ok(
-                adminProductService.getProductById(productId));
+        return ResponseEntity.ok(adminProductService.getProductById(productId));
     }
 
-    @PutMapping(
-            value = "/{productId}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public ProductResponseDTO updateProduct(
-            @PathVariable Integer productId,
-            @ModelAttribute ProductRequestDTO request)
+    @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ProductResponseDTO updateProduct(@PathVariable Integer productId, @ModelAttribute ProductRequestDTO request)
             throws IOException {
 
         return adminProductService.updateProduct(productId, request);
     }    
     @DeleteMapping("/{productId}/images/{imageId}")
-    public ResponseEntity<String> deleteProductImage(
-            @PathVariable Integer productId,
-            @PathVariable Integer imageId) throws IOException {
+    public ResponseEntity<String> deleteProductImage(@PathVariable Integer productId, @PathVariable Integer imageId) 
+    		throws IOException {
 
         adminProductService.deleteProductImage(productId, imageId);
 
@@ -68,8 +58,7 @@ public class AdminProductController {
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<String> deleteProduct(
-            @PathVariable Integer productId)
+    public ResponseEntity<String> deleteProduct(@PathVariable Integer productId)
             throws IOException {
 
         adminProductService.deleteProduct(productId);

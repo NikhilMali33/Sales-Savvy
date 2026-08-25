@@ -1,0 +1,686 @@
+/* ============================================================
+   USER DETAILS PAGE
+   ============================================================ */
+
+.admin-user-details-page {
+    min-height: calc(100vh - 70px);
+    padding: 40px 24px 60px;
+}
+
+.admin-user-details-container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+
+/* ============================================================
+   BACK LINK
+   ============================================================ */
+
+.back-to-users {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 28px;
+
+    color: #2563eb;
+    text-decoration: none;
+
+    font-size: 15px;
+    font-weight: 500;
+
+    transition: color 0.2s ease;
+}
+
+.back-to-users:hover {
+    color: #1d4ed8;
+}
+
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+
+.admin-user-details-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    margin-bottom: 32px;
+}
+
+.user-header-icon {
+    width: 64px;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #e8eef8;
+    color: #1e293b;
+
+    flex-shrink: 0;
+}
+
+.admin-user-details-header h1 {
+    margin: 0;
+
+    font-size: 32px;
+    font-weight: 700;
+
+    color: #172554;
+}
+
+.admin-user-details-header p {
+    margin: 6px 0 0;
+
+    font-size: 15px;
+    color: #64748b;
+}
+
+
+/* ============================================================
+   COMMON SECTION
+   ============================================================ */
+
+.user-details-section {
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    padding: 28px;
+
+    margin-bottom: 28px;
+
+    box-shadow:
+        0 2px 8px rgba(15, 23, 42, 0.06),
+        0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.user-details-section h2 {
+    margin: 0 0 24px;
+
+    font-size: 22px;
+    font-weight: 700;
+
+    color: #172554;
+}
+
+
+/* ============================================================
+   ACCOUNT INFORMATION
+   ============================================================ */
+
+.user-account-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 24px 40px;
+}
+
+.user-info-item {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 0;
+}
+
+.user-info-item > span:first-child {
+    font-size: 13px;
+    font-weight: 500;
+
+    color: #64748b;
+}
+
+.user-info-item strong {
+    font-size: 16px;
+    font-weight: 600;
+
+    color: #0f172a;
+
+    word-break: break-word;
+}
+
+
+/* ============================================================
+   ROLE BADGE
+   ============================================================ */
+
+.user-role {
+    display: inline-flex;
+    align-items: center;
+
+    width: fit-content;
+
+    padding: 5px 12px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 0.2px;
+}
+
+.user-role.customer {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.user-role.admin {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+
+/* ============================================================
+   ORDER SUMMARY
+   ============================================================ */
+
+.user-summary-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+.user-summary-card {
+    display: flex;
+    align-items: center;
+
+    gap: 16px;
+
+    padding: 22px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    background: #f8fafc;
+}
+
+.summary-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 12px;
+
+    background: #e8eef8;
+    color: #1e40af;
+}
+
+.user-summary-card span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    color: #64748b;
+}
+
+.user-summary-card strong {
+    display: block;
+
+    font-size: 23px;
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+
+/* ============================================================
+   ORDER HISTORY HEADER
+   ============================================================ */
+
+.section-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+}
+
+.section-heading-row h2 {
+    margin: 0;
+}
+
+.section-heading-row > span {
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    background: #f1f5f9;
+    color: #475569;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   ORDER TABLE
+   ============================================================ */
+
+.user-orders-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.user-orders-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 760px;
+}
+
+.user-orders-table thead {
+    background: #f8fafc;
+}
+
+.user-orders-table th {
+    padding: 14px 16px;
+
+    text-align: left;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #475569;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    white-space: nowrap;
+}
+
+.user-orders-table td {
+    padding: 16px;
+
+    font-size: 14px;
+
+    color: #334155;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    vertical-align: middle;
+}
+
+.user-orders-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.user-orders-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.user-orders-table td strong {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   ORDER STATUS BADGES
+   ============================================================ */
+
+.order-status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* PAYMENT STATUS */
+
+.payment-success {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.payment-pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.payment-failed {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+
+/* ORDER STATUS */
+
+.status-placed {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.status-confirmed {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-shipped {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.status-delivered {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+
+/* ============================================================
+   NO ORDERS
+   ============================================================ */
+
+.no-user-orders {
+    padding: 40px 20px;
+
+    text-align: center;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+    color: #64748b;
+
+    font-size: 15px;
+}
+
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+
+.admin-user-details-loading {
+    min-height: 400px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #64748b;
+
+    font-size: 16px;
+}
+
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+
+.admin-user-details-error {
+    min-height: 400px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    color: #475569;
+}
+
+.admin-user-details-error svg {
+    color: #64748b;
+
+    margin-bottom: 8px;
+}
+
+.admin-user-details-error h2 {
+    margin: 8px 0;
+
+    color: #172554;
+
+    font-size: 24px;
+}
+
+.admin-user-details-error p {
+    margin: 0 0 20px;
+
+    color: #64748b;
+}
+
+
+
+/* ============================================================
+   ORDER HISTORY PAGINATION
+   ============================================================ */
+
+.user-orders-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 20px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+
+/* ============================================================
+   PAGINATION BUTTONS
+   ============================================================ */
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    min-width: 105px;
+
+    padding: 9px 14px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.pagination-btn:hover:not(:disabled) {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+
+.pagination-btn:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+    background: #f8fafc;
+}
+
+
+/* ============================================================
+   PAGE NUMBERS
+   ============================================================ */
+
+.pagination-pages {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+.pagination-page {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #475569;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.pagination-page:hover {
+    background: #f8fafc;
+
+    border-color: #94a3b8;
+}
+
+
+.pagination-page.active {
+    background: #172554;
+
+    border-color: #172554;
+
+    color: #ffffff;
+
+    cursor: default;
+}
+
+
+/* ============================================================
+   RESPONSIVE PAGINATION
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+    .user-orders-pagination {
+        flex-wrap: wrap;
+
+        justify-content: center;
+
+        gap: 14px;
+    }
+
+    .pagination-pages {
+        order: -1;
+
+        width: 100%;
+
+        justify-content: center;
+    }
+
+    .pagination-btn {
+        min-width: 100px;
+    }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 800px) {
+
+    .user-account-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .user-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+
+
+
+@media (max-width: 600px) {
+
+    .admin-user-details-page {
+        padding: 24px 16px 40px;
+    }
+
+    .user-details-section {
+        padding: 20px;
+    }
+
+    .admin-user-details-header {
+        align-items: flex-start;
+    }
+
+    .admin-user-details-header h1 {
+        font-size: 26px;
+    }
+
+    .user-header-icon {
+        width: 52px;
+        height: 52px;
+    }
+
+    .section-heading-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}

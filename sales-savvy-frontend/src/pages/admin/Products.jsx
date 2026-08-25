@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import { getAllProducts, deleteProduct } from "../../services/adminProductService";
+import { getAllProducts, deleteProduct } from "../../services/adminService";
 import "../../styles/admin/Products.css";
 
 function Products() {

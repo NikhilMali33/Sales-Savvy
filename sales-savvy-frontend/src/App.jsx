@@ -22,6 +22,8 @@ import Orders from "./pages/admin/Orders";
 import Users from "./pages/admin/Users";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EditProduct from "./pages/admin/EditProduct";
+import AdminOrderDetails from "./pages/admin/OrderDetails";
+import UserDetails from "./pages/admin/UserDetails";
 
 function App() {
   return (
@@ -45,7 +47,7 @@ function App() {
         <Route path="/orders" element={<CustomerOrders />} />
         <Route path="/orders/:orderId" element={<OrderDetails />} />
         <Route path="/profile" element={<Profile />} />
-        
+
 
         {/* Admin */}
 
@@ -98,6 +100,15 @@ function App() {
           }
         />
 
+        <Route
+          path="/admin/orders/:orderId"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <AdminOrderDetails />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/admin/users"
           element={
             <ProtectedRoute allowedRole="ADMIN">
@@ -105,6 +116,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+
+        <Route
+          path="/admin/users/:userId"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <UserDetails />
+            </ProtectedRoute>
+          }
+        />
+
+
 
       </Routes>
 

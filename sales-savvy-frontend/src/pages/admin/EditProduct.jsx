@@ -5,7 +5,7 @@ import {
     getProductById,
     updateProduct,
     deleteProductImage
-} from "../../services/adminProductService";
+} from "../../services/adminService";
 
 import { getAllCategories } from "../../services/categoryService";
 
@@ -18,10 +18,7 @@ function EditProduct() {
     const navigate = useNavigate();
 
 
-    // ============================
     // STATE
-    // ============================
-
     const [categories, setCategories] = useState([]);
 
     // Images already stored in backend
@@ -56,10 +53,7 @@ function EditProduct() {
     const [error, setError] = useState("");
 
 
-    // ============================
     // FETCH PRODUCT + CATEGORIES
-    // ============================
-
     useEffect(() => {
 
         fetchProduct();
@@ -161,10 +155,7 @@ function EditProduct() {
     };
 
 
-    // ============================
     // FORM HANDLING
-    // ============================
-
     const handleChange = (e) => {
 
         const { name, value } = e.target;
@@ -180,10 +171,7 @@ function EditProduct() {
     };
 
 
-    // ============================
     // NEW IMAGE SELECTION
-    // ============================
-
     const handleImageChange = (e) => {
 
         const selectedFiles =
@@ -207,9 +195,7 @@ function EditProduct() {
     };
 
 
-    // ============================
     // REMOVE NEWLY SELECTED IMAGE
-    // ============================
 
     const handleRemoveNewImage = (index) => {
 
@@ -246,10 +232,7 @@ function EditProduct() {
     };
 
 
-    // ============================
     // DELETE EXISTING IMAGE
-    // ============================
-
     const handleDeleteImage = async (imageId) => {
 
         const confirmed = window.confirm(
@@ -313,10 +296,7 @@ function EditProduct() {
     };
 
 
-    // ============================
     // UPDATE PRODUCT
-    // ============================
-
     const handleSubmit = async (e) => {
 
         e.preventDefault();
@@ -324,10 +304,7 @@ function EditProduct() {
         setError("");
 
 
-        // ============================
         // VALIDATION
-        // ============================
-
         if (!formData.productName.trim()) {
 
             setError(
@@ -391,10 +368,7 @@ function EditProduct() {
             setSaving(true);
 
 
-            // ============================
             // CREATE MULTIPART FORMDATA
-            // ============================
-
             const data = new FormData();
 
 
@@ -464,38 +438,23 @@ function EditProduct() {
             );
 
 
-            // ============================
             // ADD NEW IMAGES
-            // ============================
 
             images.forEach((image) => {
 
-                data.append(
-                    "images",
-                    image
-                );
+                data.append("images", image);
 
             });
 
 
-            // ============================
             // SEND UPDATE REQUEST
-            // ============================
-
-            await updateProduct(
-                id,
-                data
-            );
+            await updateProduct(id, data);
 
 
-            alert(
-                "Product updated successfully!"
-            );
+            alert("Product updated successfully!");
 
 
-            navigate(
-                "/admin/products"
-            );
+            navigate("/admin/products");
 
 
         } catch (error) {
@@ -531,10 +490,7 @@ function EditProduct() {
     };
 
 
-    // ============================
     // LOADING
-    // ============================
-
     if (loading) {
 
         return (
@@ -554,10 +510,7 @@ function EditProduct() {
     }
 
 
-    // ============================
     // PAGE
-    // ============================
-
     return (
 
         <div className="add-product-container">
