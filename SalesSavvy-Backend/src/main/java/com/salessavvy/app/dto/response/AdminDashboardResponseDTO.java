@@ -19,6 +19,7 @@ public class AdminDashboardResponseDTO {
     private List<AdminRecentOrderResponseDTO> recentOrders;
     private List<AdminRecentUserResponseDTO> recentUsers;
     private List<AdminLowStockProductResponseDTO> lowStockProducts;
+    private List<AdminSalesDataDTO> salesData;
 
     public AdminDashboardResponseDTO() {
     }
@@ -35,7 +36,8 @@ public class AdminDashboardResponseDTO {
             long cancelledOrders,
             List<AdminRecentOrderResponseDTO> recentOrders,
             List<AdminRecentUserResponseDTO> recentUsers,
-            List<AdminLowStockProductResponseDTO> lowStockProducts) {
+            List<AdminLowStockProductResponseDTO> lowStockProducts,
+            List<AdminSalesDataDTO> salesData) {
 
         this.totalUsers = totalUsers;
         this.totalOrders = totalOrders;
@@ -49,6 +51,7 @@ public class AdminDashboardResponseDTO {
         this.recentOrders = recentOrders;
         this.recentUsers = recentUsers;
         this.lowStockProducts = lowStockProducts;
+        this.salesData = salesData;
     }
 
     public long getTotalUsers() {
@@ -148,5 +151,13 @@ public class AdminDashboardResponseDTO {
     public void setLowStockProducts(
             List<AdminLowStockProductResponseDTO> lowStockProducts) {
         this.lowStockProducts = lowStockProducts;
+    }
+
+    public List<AdminSalesDataDTO> getSalesData() {
+        return salesData;
+    }
+
+    public void setSalesData(List<AdminSalesDataDTO> salesData) {
+        this.salesData = salesData;
     }
 }

@@ -20,6 +20,7 @@ import Products from "./pages/admin/Products";
 import Categories from "./pages/admin/Categories";
 import Orders from "./pages/admin/Orders";
 import Users from "./pages/admin/Users";
+import AdminProfile from "./pages/admin/AdminProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EditProduct from "./pages/admin/EditProduct";
 import AdminOrderDetails from "./pages/admin/OrderDetails";
@@ -67,19 +68,15 @@ function App() {
         />
 
         <Route
+          path="/admin/profile"
+          element={<AdminProfile />}
+        />
+
+        <Route
           path="/admin/products/add"
           element={
             <ProtectedRoute allowedRole="ADMIN">
               <AddProduct />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin/products/edit/:id"
-          element={
-            <ProtectedRoute allowedRole="ADMIN">
-              <EditProduct />
             </ProtectedRoute>
           }
         />
@@ -101,6 +98,15 @@ function App() {
         />
 
         <Route
+          path="/admin/products/edit/:id"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <EditProduct />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/admin/orders/:orderId"
           element={
             <ProtectedRoute allowedRole="ADMIN">
@@ -116,7 +122,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
 
         <Route
           path="/admin/users/:userId"

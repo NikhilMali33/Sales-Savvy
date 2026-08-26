@@ -4,9 +4,18 @@ import {
     ShoppingCart,
     Package,
     IndianRupee,
-    Eye,
     AlertTriangle
 } from "lucide-react";
+
+import {
+    ResponsiveContainer,
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip
+} from "recharts";
 
 import AdminNavBar from "../../components/layout/AdminNavbar";
 import { getDashboardData } from "../../services/adminService";
@@ -58,6 +67,15 @@ function Dashboard() {
         return `₹${Number(amount || 0).toLocaleString("en-IN")}`;
     };
 
+    const formatChartDate = (date) => {
+        if (!date) return "";
+
+        return new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "short"
+        });
+    };
+
     if (loading) {
         return (
             <>
@@ -104,6 +122,7 @@ function Dashboard() {
                     <div className="admin-dashboard-header">
                         <div>
                             <h1>Dashboard</h1>
+
                             <p>
                                 Overview of your SalesSavvy store
                             </p>
@@ -119,6 +138,7 @@ function Dashboard() {
 
                             <div>
                                 <span>Total Users</span>
+
                                 <strong>
                                     {dashboard.totalUsers}
                                 </strong>
@@ -132,6 +152,7 @@ function Dashboard() {
 
                             <div>
                                 <span>Total Orders</span>
+
                                 <strong>
                                     {dashboard.totalOrders}
                                 </strong>
@@ -145,8 +166,11 @@ function Dashboard() {
 
                             <div>
                                 <span>Total Revenue</span>
+
                                 <strong>
-                                    {formatAmount(dashboard.totalRevenue)}
+                                    {formatAmount(
+                                        dashboard.totalRevenue
+                                    )}
                                 </strong>
                             </div>
                         </div>
@@ -158,6 +182,7 @@ function Dashboard() {
 
                             <div>
                                 <span>Total Products</span>
+
                                 <strong>
                                     {dashboard.totalProducts}
                                 </strong>
@@ -167,9 +192,11 @@ function Dashboard() {
                     </div>
 
                     <section className="dashboard-section">
+
                         <div className="dashboard-section-header">
                             <div>
                                 <h2>Order Overview</h2>
+
                                 <p>
                                     Current order status breakdown
                                 </p>
@@ -180,6 +207,7 @@ function Dashboard() {
 
                             <div className="order-status-card">
                                 <span>Placed</span>
+
                                 <strong>
                                     {dashboard.placedOrders}
                                 </strong>
@@ -187,6 +215,7 @@ function Dashboard() {
 
                             <div className="order-status-card">
                                 <span>Confirmed</span>
+
                                 <strong>
                                     {dashboard.confirmedOrders}
                                 </strong>
@@ -194,6 +223,7 @@ function Dashboard() {
 
                             <div className="order-status-card">
                                 <span>Shipped</span>
+
                                 <strong>
                                     {dashboard.shippedOrders}
                                 </strong>
@@ -201,6 +231,7 @@ function Dashboard() {
 
                             <div className="order-status-card">
                                 <span>Delivered</span>
+
                                 <strong>
                                     {dashboard.deliveredOrders}
                                 </strong>
@@ -208,12 +239,108 @@ function Dashboard() {
 
                             <div className="order-status-card">
                                 <span>Cancelled</span>
+
                                 <strong>
                                     {dashboard.cancelledOrders}
                                 </strong>
                             </div>
 
                         </div>
+
+                    </section>
+
+                    <section className="dashboard-section dashboard-sales-section">
+
+                        <div className="dashboard-section-header">
+                            <div>
+                                <h2>Sales Overview</h2>
+
+                                <p>
+                                    Revenue generated over the last 7 days
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="sales-chart-wrapper">
+
+                            {dashboard.salesData?.length > 0 ? (
+
+                                <ResponsiveContainer
+                                    width="100%"
+                                    height="100%"
+                                >
+
+                                    <LineChart
+                                        data={dashboard.salesData}
+                                        margin={{
+                                            top: 10,
+                                            right: 20,
+                                            left: 10,
+                                            bottom: 10
+                                        }}
+                                    >
+
+                                        <CartesianGrid
+                                            strokeDasharray="3 3"
+                                            vertical={false}
+                                        />
+
+                                        <XAxis
+                                            dataKey="date"
+                                            tickFormatter={formatChartDate}
+                                            tick={{
+                                                fontSize: 12
+                                            }}
+                                        />
+
+                                        <YAxis
+                                            tick={{
+                                                fontSize: 12
+                                            }}
+                                            tickFormatter={(value) =>
+                                                `₹${Number(
+                                                    value
+                                                ).toLocaleString("en-IN")}`
+                                            }
+                                        />
+
+                                        <Tooltip
+                                            formatter={(value) => [
+                                                formatAmount(value),
+                                                "Revenue"
+                                            ]}
+                                            labelFormatter={(label) =>
+                                                formatChartDate(label)
+                                            }
+                                        />
+
+                                        <Line
+                                            type="monotone"
+                                            dataKey="revenue"
+                                            stroke="#2563eb"
+                                            strokeWidth={3}
+                                            dot={{
+                                                r: 4
+                                            }}
+                                            activeDot={{
+                                                r: 6
+                                            }}
+                                        />
+
+                                    </LineChart>
+
+                                </ResponsiveContainer>
+
+                            ) : (
+
+                                <div className="dashboard-empty">
+                                    No sales data available.
+                                </div>
+
+                            )}
+
+                        </div>
+
                     </section>
 
                     <div className="dashboard-content-grid">
@@ -221,8 +348,10 @@ function Dashboard() {
                         <section className="dashboard-section dashboard-recent-orders">
 
                             <div className="dashboard-section-header">
+
                                 <div>
                                     <h2>Recent Orders</h2>
+
                                     <p>
                                         Latest customer orders
                                     </p>
@@ -234,6 +363,7 @@ function Dashboard() {
                                 >
                                     View All
                                 </a>
+
                             </div>
 
                             <div className="dashboard-table-wrapper">
@@ -241,69 +371,91 @@ function Dashboard() {
                                 <table className="dashboard-table">
 
                                     <thead>
+
                                         <tr>
                                             <th>Order</th>
                                             <th>Customer</th>
                                             <th>Amount</th>
                                             <th>Status</th>
                                         </tr>
+
                                     </thead>
 
                                     <tbody>
 
                                         {dashboard.recentOrders?.length > 0 ? (
 
-                                            dashboard.recentOrders.map((order) => (
+                                            dashboard.recentOrders.map(
+                                                (order) => (
 
-                                                <tr key={order.orderId}>
+                                                    <tr
+                                                        key={
+                                                            order.orderId
+                                                        }
+                                                    >
 
-                                                    <td>
-                                                        <strong>
-                                                            {order.orderId}
-                                                        </strong>
+                                                        <td>
 
-                                                        <small>
-                                                            {formatDate(
-                                                                order.createdAt
-                                                            )}
-                                                        </small>
-                                                    </td>
+                                                            <strong>
+                                                                {
+                                                                    order.orderId
+                                                                }
+                                                            </strong>
 
-                                                    <td>
-                                                        {order.username}
-                                                    </td>
+                                                            <small>
+                                                                {formatDate(
+                                                                    order.createdAt
+                                                                )}
+                                                            </small>
 
-                                                    <td>
-                                                        <strong>
-                                                            {formatAmount(
-                                                                order.totalAmount
-                                                            )}
-                                                        </strong>
-                                                    </td>
+                                                        </td>
 
-                                                    <td>
-                                                        <span
-                                                            className={`dashboard-badge status-${String(
-                                                                order.status
-                                                            ).toLowerCase()}`}
-                                                        >
-                                                            {order.status}
-                                                        </span>
-                                                    </td>
+                                                        <td>
+                                                            {
+                                                                order.username
+                                                            }
+                                                        </td>
 
-                                                </tr>
+                                                        <td>
 
-                                            ))
+                                                            <strong>
+                                                                {formatAmount(
+                                                                    order.totalAmount
+                                                                )}
+                                                            </strong>
+
+                                                        </td>
+
+                                                        <td>
+
+                                                            <span
+                                                                className={`dashboard-badge status-${String(
+                                                                    order.status
+                                                                ).toLowerCase()}`}
+                                                            >
+                                                                {
+                                                                    order.status
+                                                                }
+                                                            </span>
+
+                                                        </td>
+
+                                                    </tr>
+
+                                                )
+                                            )
 
                                         ) : (
 
                                             <tr>
+
                                                 <td
                                                     colSpan="4"
                                                     className="dashboard-empty"
                                                 >
                                                     No recent orders found.
                                                 </td>
+
                                             </tr>
 
                                         )}
@@ -319,8 +471,10 @@ function Dashboard() {
                         <section className="dashboard-section dashboard-recent-users">
 
                             <div className="dashboard-section-header">
+
                                 <div>
                                     <h2>Recent Users</h2>
+
                                     <p>
                                         Newly registered users
                                     </p>
@@ -332,6 +486,7 @@ function Dashboard() {
                                 >
                                     View All
                                 </a>
+
                             </div>
 
                             <div className="dashboard-table-wrapper">
@@ -339,60 +494,80 @@ function Dashboard() {
                                 <table className="dashboard-table">
 
                                     <thead>
+
                                         <tr>
                                             <th>User</th>
                                             <th>Role</th>
                                             <th>Joined</th>
                                         </tr>
+
                                     </thead>
 
                                     <tbody>
 
                                         {dashboard.recentUsers?.length > 0 ? (
 
-                                            dashboard.recentUsers.map((user) => (
+                                            dashboard.recentUsers.map(
+                                                (user) => (
 
-                                                <tr key={user.userId}>
+                                                    <tr
+                                                        key={
+                                                            user.userId
+                                                        }
+                                                    >
 
-                                                    <td>
-                                                        <strong>
-                                                            {user.username}
-                                                        </strong>
+                                                        <td>
 
-                                                        <small>
-                                                            {user.email}
-                                                        </small>
-                                                    </td>
+                                                            <strong>
+                                                                {
+                                                                    user.username
+                                                                }
+                                                            </strong>
 
-                                                    <td>
-                                                        <span
-                                                            className={`dashboard-badge role-${String(
-                                                                user.role
-                                                            ).toLowerCase()}`}
-                                                        >
-                                                            {user.role}
-                                                        </span>
-                                                    </td>
+                                                            <small>
+                                                                {
+                                                                    user.email
+                                                                }
+                                                            </small>
 
-                                                    <td>
-                                                        {formatDate(
-                                                            user.createdAt
-                                                        )}
-                                                    </td>
+                                                        </td>
 
-                                                </tr>
+                                                        <td>
 
-                                            ))
+                                                            <span
+                                                                className={`dashboard-badge role-${String(
+                                                                    user.role
+                                                                ).toLowerCase()}`}
+                                                            >
+                                                                {
+                                                                    user.role
+                                                                }
+                                                            </span>
+
+                                                        </td>
+
+                                                        <td>
+                                                            {formatDate(
+                                                                user.createdAt
+                                                            )}
+                                                        </td>
+
+                                                    </tr>
+
+                                                )
+                                            )
 
                                         ) : (
 
                                             <tr>
+
                                                 <td
                                                     colSpan="3"
                                                     className="dashboard-empty"
                                                 >
                                                     No recent users found.
                                                 </td>
+
                                             </tr>
 
                                         )}
@@ -410,12 +585,15 @@ function Dashboard() {
                     <section className="dashboard-section">
 
                         <div className="dashboard-section-header">
+
                             <div>
                                 <h2>Low Stock Products</h2>
+
                                 <p>
                                     Products that may need restocking
                                 </p>
                             </div>
+
                         </div>
 
                         {dashboard.lowStockProducts?.length > 0 ? (
@@ -425,12 +603,14 @@ function Dashboard() {
                                 <table className="dashboard-table">
 
                                     <thead>
+
                                         <tr>
                                             <th>Product</th>
                                             <th>Stock</th>
                                             <th>Price</th>
                                             <th>Status</th>
                                         </tr>
+
                                     </thead>
 
                                     <tbody>
@@ -438,16 +618,26 @@ function Dashboard() {
                                         {dashboard.lowStockProducts.map(
                                             (product) => (
 
-                                                <tr key={product.productId}>
+                                                <tr
+                                                    key={
+                                                        product.productId
+                                                    }
+                                                >
 
                                                     <td>
+
                                                         <strong>
-                                                            {product.name}
+                                                            {
+                                                                product.name
+                                                            }
                                                         </strong>
+
                                                     </td>
 
                                                     <td>
-                                                        {product.stock}
+                                                        {
+                                                            product.stock
+                                                        }
                                                     </td>
 
                                                     <td>
@@ -457,12 +647,17 @@ function Dashboard() {
                                                     </td>
 
                                                     <td>
+
                                                         <span className="dashboard-low-stock-badge">
+
                                                             <AlertTriangle
                                                                 size={14}
                                                             />
+
                                                             Low Stock
+
                                                         </span>
+
                                                     </td>
 
                                                 </tr>
@@ -479,17 +674,22 @@ function Dashboard() {
                         ) : (
 
                             <div className="dashboard-no-low-stock">
+
                                 <Package size={28} />
 
                                 <div>
+
                                     <strong>
                                         All products are well stocked
                                     </strong>
 
                                     <p>
-                                        There are currently no low-stock products.
+                                        There are currently no low-stock
+                                        products.
                                     </p>
+
                                 </div>
+
                             </div>
 
                         )}

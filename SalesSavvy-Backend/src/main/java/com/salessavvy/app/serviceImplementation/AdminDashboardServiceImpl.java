@@ -1,8 +1,13 @@
 package com.salessavvy.app.serviceImplementation;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +17,7 @@ import com.salessavvy.app.dto.response.AdminDashboardResponseDTO;
 import com.salessavvy.app.dto.response.AdminLowStockProductResponseDTO;
 import com.salessavvy.app.dto.response.AdminRecentOrderResponseDTO;
 import com.salessavvy.app.dto.response.AdminRecentUserResponseDTO;
+import com.salessavvy.app.dto.response.AdminSalesDataDTO;
 import com.salessavvy.app.entities.Order;
 import com.salessavvy.app.entities.Product;
 import com.salessavvy.app.entities.User;
@@ -61,26 +67,62 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .filter(amount -> amount != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        long placedOrders = countOrdersByStatus(orders, OrderStatus.PLACED);
+        long placedOrders = countOrdersByStatus(
+                orders,
+                OrderStatus.PLACED
+        );
 
-        long confirmedOrders = countOrdersByStatus(orders, OrderStatus.CONFIRMED);
+        long confirmedOrders = countOrdersByStatus(
+                orders,
+                OrderStatus.CONFIRMED
+        );
 
-        long shippedOrders = countOrdersByStatus(orders, OrderStatus.SHIPPED);
+        long shippedOrders = countOrdersByStatus(
+                orders,
+                OrderStatus.SHIPPED
+        );
 
-        long deliveredOrders = countOrdersByStatus(orders, OrderStatus.DELIVERED);
+        long deliveredOrders = countOrdersByStatus(
+                orders,
+                OrderStatus.DELIVERED
+        );
 
-        long cancelledOrders = countOrdersByStatus(orders, OrderStatus.CANCELLED);
+        long cancelledOrders = countOrdersByStatus(
+                orders,
+                OrderStatus.CANCELLED
+        );
 
-        List<AdminRecentOrderResponseDTO> recentOrders = orders.stream()
-                        .sorted(Comparator.comparing(Order::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
-                        .limit(5).map(this::convertToRecentOrderDTO).collect(Collectors.toList());
+        List<AdminRecentOrderResponseDTO> recentOrders =
+                orders.stream()
+                        .sorted(
+                                Comparator.comparing(
+                                        Order::getCreatedAt,
+                                        Comparator.nullsLast(
+                                                Comparator.reverseOrder()
+                                        )
+                                )
+                        )
+                        .limit(5)
+                        .map(this::convertToRecentOrderDTO)
+                        .collect(Collectors.toList());
 
-        List<AdminRecentUserResponseDTO> recentUsers = users.stream()
-                        .sorted(Comparator.comparing(User::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
-                        .limit(5).map(this::convertToRecentUserDTO).collect(Collectors.toList());
+        List<AdminRecentUserResponseDTO> recentUsers =
+                users.stream()
+                        .sorted(
+                                Comparator.comparing(
+                                        User::getCreatedAt,
+                                        Comparator.nullsLast(
+                                                Comparator.reverseOrder()
+                                        )
+                                )
+                        )
+                        .limit(5)
+                        .map(this::convertToRecentUserDTO)
+                        .collect(Collectors.toList());
 
         List<AdminLowStockProductResponseDTO> lowStockProducts =
-                products.stream().filter(product ->
+                products.stream()
+                        .filter(product ->
                                 product.getStock() != null &&
                                 product.getStock() <= 5)
                         .sorted(
@@ -95,6 +137,9 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                         .map(this::convertToLowStockProductDTO)
                         .collect(Collectors.toList());
 
+        List<AdminSalesDataDTO> salesData =
+                generateSalesData(orders);
+
         return new AdminDashboardResponseDTO(
                 totalUsers,
                 totalOrders,
@@ -107,8 +152,73 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 cancelledOrders,
                 recentOrders,
                 recentUsers,
-                lowStockProducts
+                lowStockProducts,
+                salesData
         );
+    }
+
+    private List<AdminSalesDataDTO> generateSalesData(
+            List<Order> orders) {
+
+        LocalDate today = LocalDate.now();
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        Map<LocalDate, BigDecimal> revenueByDate =
+                new LinkedHashMap<>();
+
+        for (int i = 6; i >= 0; i--) {
+
+            LocalDate date = today.minusDays(i);
+
+            revenueByDate.put(
+                    date,
+                    BigDecimal.ZERO
+            );
+        }
+
+        orders.stream()
+                .filter(order ->
+                        order.getPaymentStatus() == PaymentStatus.SUCCESS)
+                .filter(order ->
+                        order.getCreatedAt() != null)
+                .forEach(order -> {
+
+                    LocalDate orderDate =
+                            order.getCreatedAt().toLocalDate();
+
+                    if (revenueByDate.containsKey(orderDate)) {
+
+                        BigDecimal currentRevenue =
+                                revenueByDate.get(orderDate);
+
+                        BigDecimal orderAmount =
+                                order.getTotalAmount() != null
+                                        ? order.getTotalAmount()
+                                        : BigDecimal.ZERO;
+
+                        revenueByDate.put(
+                                orderDate,
+                                currentRevenue.add(orderAmount)
+                        );
+                    }
+                });
+
+        List<AdminSalesDataDTO> salesData =
+                new ArrayList<>();
+
+        revenueByDate.forEach((date, revenue) -> {
+
+            salesData.add(
+                    new AdminSalesDataDTO(
+                            date.format(formatter),
+                            revenue
+                    )
+            );
+        });
+
+        return salesData;
     }
 
     private long countOrdersByStatus(

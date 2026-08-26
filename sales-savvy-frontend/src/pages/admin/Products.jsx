@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { getAllProducts, deleteProduct } from "../../services/adminService";
 import "../../styles/admin/Products.css";
+import AdminNavbar from "../../components/layout/AdminNavbar";
 
 function Products() {
 
@@ -94,7 +95,9 @@ function Products() {
 
     return (
 
-        <div className="products-container">
+        <>
+            <AdminNavbar />
+            <div className="products-container">
 
             {/* Header */}
 
@@ -360,6 +363,7 @@ function Products() {
             )}
 
         </div>
+        </>
 
     );
 

@@ -361,8 +361,881 @@
 
 
 /* ============================================================
+   ADMIN USERS PAGE
+   ============================================================ */
+
+.admin-users-page {
+    min-height: calc(100vh - 70px);
+    padding: 40px 24px;
+    background: #f7f8fa;
+}
+
+.admin-users-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.admin-users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 30px;
+}
+
+.admin-users-header h1 {
+    margin: 0 0 6px;
+
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.admin-users-header p {
+    margin: 0;
+
+    color: #6b7280;
+    font-size: 15px;
+}
+
+
+/* ============================================================
+   HEADER ACTIONS
+   ============================================================ */
+
+.admin-users-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.admin-users-header-icon {
+    color: #111827;
+}
+
+
+/* ============================================================
+   ADD USER BUTTON
+   ============================================================ */
+
+.admin-add-user-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    height: 42px;
+
+    padding: 0 17px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #2563eb;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.admin-add-user-btn:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 4px 10px rgba(37, 99, 235, 0.22);
+}
+
+.admin-add-user-btn:active {
+    transform: translateY(0);
+}
+
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.admin-users-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.admin-users-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 700px;
+}
+
+.admin-users-table th {
+    padding: 16px 20px;
+
+    text-align: left;
+
+    background: #f9fafb;
+
+    color: #374151;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-users-table td {
+    padding: 18px 20px;
+
+    color: #374151;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-users-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-users-table tbody tr:hover {
+    background: #fafafa;
+}
+
+
+/* ============================================================
+   VIEW USER BUTTON
+   ============================================================ */
+
+.admin-view-user-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-width: 125px;
+    height: 40px;
+
+    padding: 0 16px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #111827;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.admin-view-user-btn:hover {
+    background: #1f2937;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 4px 10px rgba(17, 24, 39, 0.18);
+}
+
+.admin-view-user-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.admin-view-user-btn:focus {
+    outline: none;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+
+/* ============================================================
+   ROLE
+   ============================================================ */
+
+.user-role {
+    display: inline-block;
+
+    padding: 5px 11px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.user-role.admin {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.user-role.customer {
+    background: #dcfce7;
+    color: #166534;
+}
+
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
+.admin-users-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 25px;
+}
+
+.pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pagination-btn,
+.pagination-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 38px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #374151;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.pagination-btn {
+    padding: 0 15px;
+}
+
+.pagination-number {
+    width: 38px;
+}
+
+.pagination-btn:hover:not(:disabled),
+.pagination-number:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.pagination-number.active {
+    background: #111827;
+    border-color: #111827;
+    color: #ffffff;
+}
+
+.pagination-number.active:hover {
+    background: #1f2937;
+    border-color: #1f2937;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   PAGINATION INFO
+   ============================================================ */
+
+.admin-users-pagination-info {
+    margin-top: 12px;
+
+    text-align: center;
+
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+
+.admin-users-loading {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    min-height: 300px;
+
+    color: #6b7280;
+
+    font-size: 16px;
+}
+
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+
+.admin-users-error {
+    padding: 20px;
+
+    text-align: center;
+
+    color: #b91c1c;
+
+    background: #fee2e2;
+
+    border-radius: 10px;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.admin-users-empty {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    min-height: 350px;
+
+    padding: 40px;
+
+    text-align: center;
+
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.admin-users-empty h2 {
+    margin: 20px 0 8px;
+}
+
+.admin-users-empty p {
+    margin: 0;
+
+    color: #6b7280;
+}
+
+
+/* ============================================================
+   NO USERS
+   ============================================================ */
+
+.no-users {
+    padding: 40px !important;
+
+    text-align: center;
+
+    color: #6b7280 !important;
+}
+
+
+/* ============================================================
+   ADD USER MODAL OVERLAY
+   ============================================================ */
+
+.admin-add-user-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(15, 23, 42, 0.55);
+
+    backdrop-filter: blur(3px);
+}
+
+
+/* ============================================================
+   ADD USER MODAL
+   ============================================================ */
+
+.admin-add-user-modal {
+    width: 100%;
+    max-width: 500px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.25);
+
+    animation:
+        adminModalAppear 0.2s ease;
+}
+
+@keyframes adminModalAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+
+/* ============================================================
+   MODAL HEADER
+   ============================================================ */
+
+.admin-add-user-modal-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 22px 24px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-add-user-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+}
+
+.admin-add-user-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+}
+
+.admin-add-user-title h2 {
+    margin: 0 0 3px;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    color: #111827;
+}
+
+.admin-add-user-title p {
+    margin: 0;
+
+    font-size: 12px;
+
+    color: #6b7280;
+}
+
+.admin-add-user-close {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #6b7280;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.admin-add-user-close:hover:not(:disabled) {
+    background: #f3f4f6;
+
+    color: #111827;
+}
+
+.admin-add-user-close:disabled {
+    opacity: 0.5;
+
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.admin-add-user-form {
+    padding: 24px;
+}
+
+.admin-form-group {
+    margin-bottom: 17px;
+}
+
+.admin-form-group label {
+    display: block;
+
+    margin: 0 0 7px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+.admin-form-input {
+    height: 46px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 0 13px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.admin-form-input:focus-within {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.admin-form-input svg {
+    flex-shrink: 0;
+
+    color: #6b7280;
+}
+
+.admin-form-input input,
+.admin-form-input select {
+    width: 100%;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    color: #374151;
+}
+
+.admin-form-input input::placeholder {
+    color: #9ca3af;
+}
+
+.admin-form-input select {
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   FORM MESSAGES
+   ============================================================ */
+
+.admin-add-user-form-error {
+    margin-bottom: 16px;
+
+    padding: 11px 13px;
+
+    border-radius: 8px;
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+.admin-add-user-form-success {
+    margin-bottom: 16px;
+
+    padding: 11px 13px;
+
+    border-radius: 8px;
+
+    background: #dcfce7;
+
+    color: #15803d;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+
+/* ============================================================
+   MODAL ACTIONS
+   ============================================================ */
+
+.admin-add-user-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 24px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #f0f0f0;
+}
+
+.admin-add-user-cancel,
+.admin-add-user-submit {
+    height: 42px;
+
+    padding: 0 18px;
+
+    border-radius: 8px;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
+}
+
+.admin-add-user-cancel {
+    border: 1px solid #d1d5db;
+
+    background: #ffffff;
+
+    color: #374151;
+}
+
+.admin-add-user-cancel:hover:not(:disabled) {
+    background: #f9fafb;
+
+    border-color: #9ca3af;
+}
+
+.admin-add-user-submit {
+    border: 1px solid #2563eb;
+
+    background: #2563eb;
+
+    color: #ffffff;
+}
+
+.admin-add-user-submit:hover:not(:disabled) {
+    background: #1d4ed8;
+
+    border-color: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+.admin-add-user-cancel:disabled,
+.admin-add-user-submit:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
+
+@media (max-width: 768px) {
+
+    .admin-users-page {
+        padding: 30px 16px;
+    }
+
+    .admin-users-header {
+        align-items: flex-start;
+    }
+
+    .admin-users-header h1 {
+        font-size: 28px;
+    }
+
+    .admin-users-header-actions {
+        gap: 10px;
+    }
+
+    .admin-users-header-icon {
+        display: none;
+    }
+
+    .admin-add-user-btn {
+        height: 40px;
+
+        padding: 0 13px;
+    }
+
+    .admin-users-pagination {
+        flex-wrap: wrap;
+    }
+
+    .pagination-pages {
+        order: 1;
+
+        width: 100%;
+
+        justify-content: center;
+    }
+
+    .pagination-btn {
+        order: 2;
+    }
+
+    .admin-add-user-modal {
+        max-width: 100%;
+
+        border-radius: 12px;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .admin-users-header {
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+    .admin-users-header-actions {
+        width: 100%;
+
+        justify-content: flex-end;
+    }
+
+    .admin-add-user-btn {
+        width: 100%;
+    }
+
+    .admin-add-user-form {
+        padding: 20px;
+    }
+
+    .admin-add-user-modal-header {
+        padding: 18px 20px;
+    }
+
+    .admin-add-user-actions {
+        flex-direction: column-reverse;
+    }
+
+    .admin-add-user-cancel,
+    .admin-add-user-submit {
+        width: 100%;
+    }
+
+}
+
+
+/* RESPONSIVE */
 
 @media (max-width: 768px) {
 
