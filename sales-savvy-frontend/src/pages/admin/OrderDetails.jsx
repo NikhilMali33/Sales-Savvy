@@ -11,7 +11,6 @@ import {
 
 import "../../styles/admin/OrderDetails.css";
 
-
 const OrderDetails = () => {
 
     const { orderId } = useParams();
@@ -20,9 +19,9 @@ const OrderDetails = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [updatingStatus, setUpdatingStatus] = useState(false);
+    const [statusMessage, setStatusMessage] = useState("");
 
-
-    // LOAD ORDER
+    // Load order details
     useEffect(() => {
 
         const fetchOrder = async () => {
@@ -31,6 +30,7 @@ const OrderDetails = () => {
 
                 setLoading(true);
                 setError("");
+                setStatusMessage("");
 
                 const response =
                     await getOrderById(orderId);
@@ -55,82 +55,65 @@ const OrderDetails = () => {
             }
         };
 
-
         if (orderId) {
             fetchOrder();
         }
 
     }, [orderId]);
 
-
-    // GET ALLOWED STATUS OPTIONS
+    // Get allowed status options
     const getAllowedStatuses = (currentStatus) => {
 
         switch (currentStatus) {
 
             case "PLACED":
-
                 return [
                     "PLACED",
                     "CONFIRMED",
                     "CANCELLED"
                 ];
 
-
             case "CONFIRMED":
-
                 return [
                     "CONFIRMED",
                     "PROCESSING",
                     "CANCELLED"
                 ];
 
-
             case "PROCESSING":
-
                 return [
                     "PROCESSING",
                     "SHIPPED"
                 ];
 
-
             case "SHIPPED":
-
                 return [
                     "SHIPPED",
                     "DELIVERED"
                 ];
 
-
             case "DELIVERED":
-
                 return [
                     "DELIVERED"
                 ];
 
-
             case "CANCELLED":
-
                 return [
                     "CANCELLED"
                 ];
 
-
             default:
-
                 return [
                     currentStatus
                 ];
         }
     };
 
-
-    // UPDATE ORDER STATUS
+    // Update order status
     const handleStatusChange = async (event) => {
 
         const newStatus =
             event.target.value;
-
 
         if (
             !newStatus ||
@@ -140,11 +123,11 @@ const OrderDetails = () => {
             return;
         }
 
-
         try {
 
             setUpdatingStatus(true);
             setError("");
+            setStatusMessage("");
 
             const response =
                 await updateOrderStatus(
@@ -153,6 +136,10 @@ const OrderDetails = () => {
                 );
 
             setOrder(response.data);
+
+            setStatusMessage(
+                `Order status updated to ${newStatus}.`
+            );
 
         } catch (err) {
 
@@ -172,42 +159,61 @@ const OrderDetails = () => {
         }
     };
 
-
-    // LOADING
+    // Loading state
     if (loading) {
 
         return (
             <>
                 <AdminNavbar />
 
-                <div className="admin-order-details-page">
+                <main
+                    className="admin-order-details-page"
+                    aria-labelledby="order-loading-title"
+                >
+                    <div
+                        className="admin-order-details-loading"
+                        role="status"
+                        aria-live="polite"
+                        aria-atomic="true"
+                    >
+                        <Package
+                            size={42}
+                            aria-hidden="true"
+                        />
 
-                    <div className="admin-order-details-loading">
+                        <h1 id="order-loading-title">
+                            Loading order details
+                        </h1>
 
-                        Loading order details...
-
+                        <p>
+                            Please wait while the order information is loaded.
+                        </p>
                     </div>
-
-                </div>
+                </main>
             </>
         );
     }
 
-
-    // ERROR / ORDER NOT FOUND
+    // Error state
     if (error && !order) {
 
         return (
             <>
                 <AdminNavbar />
 
-                <div className="admin-order-details-page">
-
-                    <div className="admin-order-details-error">
-
-                        <h2>
+                <main
+                    className="admin-order-details-page"
+                    aria-labelledby="order-error-title"
+                >
+                    <div
+                        className="admin-order-details-error"
+                        role="alert"
+                        aria-live="assertive"
+                        aria-atomic="true"
+                    >
+                        <h1 id="order-error-title">
                             Unable to load order
-                        </h2>
+                        </h1>
 
                         <p>
                             {error}
@@ -217,20 +223,18 @@ const OrderDetails = () => {
                             to="/admin/orders"
                             className="back-orders-btn"
                         >
-
-                            <ArrowLeft size={18} />
+                            <ArrowLeft
+                                size={18}
+                                aria-hidden="true"
+                            />
 
                             Back to Orders
-
                         </Link>
-
                     </div>
-
-                </div>
+                </main>
             </>
         );
     }
-
 
     if (!order) {
 
@@ -238,108 +242,104 @@ const OrderDetails = () => {
             <>
                 <AdminNavbar />
 
-                <div className="admin-order-details-page">
-
+                <main
+                    className="admin-order-details-page"
+                    aria-labelledby="order-not-found-title"
+                >
                     <div className="admin-order-details-error">
 
-                        <h2>
+                        <h1 id="order-not-found-title">
                             Order not found
-                        </h2>
+                        </h1>
+
+                        <p>
+                            The requested order could not be found.
+                        </p>
 
                         <Link
                             to="/admin/orders"
                             className="back-orders-btn"
                         >
-
-                            <ArrowLeft size={18} />
+                            <ArrowLeft
+                                size={18}
+                                aria-hidden="true"
+                            />
 
                             Back to Orders
-
                         </Link>
 
                     </div>
-
-                </div>
+                </main>
             </>
         );
     }
 
-
-    // STATUS OPTIONS
-
-    const allowedStatuses = getAllowedStatuses(order.status);
-
-    // ORDER DETAILS
+    const allowedStatuses =
+        getAllowedStatuses(order.status);
 
     return (
         <>
             <AdminNavbar />
 
-            <div className="admin-order-details-page">
+            <main
+                className="admin-order-details-page"
+                aria-labelledby="order-details-title"
+            >
 
                 <div className="admin-order-details-container">
 
-
-                    {/* ==================================================
-                        BACK BUTTON
-                    ================================================== */}
+                    {/* Back navigation */}
 
                     <Link
                         to="/admin/orders"
                         className="back-orders-link"
                     >
-
-                        <ArrowLeft size={18} />
+                        <ArrowLeft
+                            size={18}
+                            aria-hidden="true"
+                        />
 
                         Back to Orders
-
                     </Link>
 
+                    {/* Order header */}
 
-                    {/* ==================================================
-                        HEADER
-                    ================================================== */}
-
-                    <div className="admin-order-details-header">
+                    <section
+                        className="admin-order-details-header"
+                        aria-labelledby="order-details-title"
+                    >
 
                         <div>
 
                             <div className="admin-order-title-row">
 
-                                <Package size={32} />
+                                <Package
+                                    size={32}
+                                    aria-hidden="true"
+                                />
 
-                                <h1>
+                                <h1 id="order-details-title">
                                     Order Details
                                 </h1>
 
                             </div>
 
-
                             <p>
-
                                 Order ID:{" "}
-
                                 <strong>
                                     {order.orderId}
                                 </strong>
-
                             </p>
 
                         </div>
 
-
-                        {/* ==================================================
-                            STATUS CONTROL
-                        ================================================== */}
+                        {/* Status control */}
 
                         <div className="admin-status-control">
 
                             <label htmlFor="order-status">
-
                                 Order Status
-
                             </label>
-
 
                             <select
                                 id="order-status"
@@ -350,71 +350,81 @@ const OrderDetails = () => {
                                     order.status === "DELIVERED" ||
                                     order.status === "CANCELLED"
                                 }
+                                aria-describedby="order-status-help"
                             >
 
                                 {allowedStatuses.map(
                                     (status) => (
-
                                         <option
                                             key={status}
                                             value={status}
                                         >
-
                                             {status}
-
                                         </option>
-
                                     )
                                 )}
 
                             </select>
 
+                            <small id="order-status-help">
+                                {order.status === "DELIVERED" ||
+                                order.status === "CANCELLED"
+                                    ? "This order status cannot be changed."
+                                    : "Select a new status to update the order."
+                                }
+                            </small>
 
                             {updatingStatus && (
-
-                                <small>
-                                    Updating...
-                                </small>
-
+                                <span
+                                    className="status-update-message"
+                                    role="status"
+                                    aria-live="polite"
+                                    aria-atomic="true"
+                                >
+                                    Updating order status...
+                                </span>
                             )}
 
                         </div>
 
-                    </div>
+                    </section>
 
+                    {/* Accessible status and error messages */}
 
-                    
-                    //UPDATE ERROR
-                    {error && (
-
-                        <div className="admin-order-error">
-
-                            {error}
-
+                    {statusMessage && (
+                        <div
+                            className="admin-order-success"
+                            role="status"
+                            aria-live="polite"
+                            aria-atomic="true"
+                        >
+                            {statusMessage}
                         </div>
-
                     )}
 
+                    {error && (
+                        <div
+                            className="admin-order-error"
+                            role="alert"
+                            aria-live="assertive"
+                            aria-atomic="true"
+                        >
+                            {error}
+                        </div>
+                    )}
 
-                    {/* ==================================================
-                        ORDER SUMMARY
-                    ================================================== */}
+                    {/* Order summary */}
 
-                    <div className="admin-order-summary">
-
-
-                        {/* ORDER DATE */}
+                    <section
+                        className="admin-order-summary"
+                        aria-label="Order summary"
+                    >
 
                         <div className="admin-summary-card">
-
-                            <span>
-                                Order Date
-                            </span>
+                            <span>Order Date</span>
 
                             <strong>
-
                                 {order.createdAt
-
                                     ? new Date(
                                         order.createdAt
                                     ).toLocaleDateString(
@@ -425,15 +435,10 @@ const OrderDetails = () => {
                                             year: "numeric"
                                         }
                                     )
-
-                                    : "N/A"}
-
+                                    : "N/A"
+                                }
                             </strong>
-
                         </div>
-
-
-                        {/* PAYMENT STATUS */}
 
                         <div className="admin-summary-card">
 
@@ -446,15 +451,10 @@ const OrderDetails = () => {
                                     order.paymentStatus
                                 ).toLowerCase()}`}
                             >
-
                                 {order.paymentStatus}
-
                             </strong>
 
                         </div>
-
-
-                        {/* ORDER STATUS */}
 
                         <div className="admin-summary-card">
 
@@ -467,15 +467,10 @@ const OrderDetails = () => {
                                     order.status
                                 ).toLowerCase()}`}
                             >
-
                                 {order.status}
-
                             </strong>
 
                         </div>
-
-
-                        {/* TOTAL */}
 
                         <div className="admin-summary-card">
 
@@ -483,31 +478,33 @@ const OrderDetails = () => {
                                 Total Amount
                             </span>
 
-                            <strong>
-
+                            <strong
+                                aria-label={`Total amount ₹${Number(
+                                    order.totalAmount
+                                ).toLocaleString("en-IN")}`}
+                            >
                                 ₹
                                 {Number(
                                     order.totalAmount
                                 ).toLocaleString(
                                     "en-IN"
                                 )}
-
                             </strong>
 
                         </div>
 
-                    </div>
+                    </section>
 
+                    {/* Order items */}
 
-                    {/* ==================================================
-                        ORDER ITEMS
-                    ================================================== */}
-
-                    <div className="admin-order-section">
+                    <section
+                        className="admin-order-section"
+                        aria-labelledby="order-items-title"
+                    >
 
                         <div className="admin-section-header">
 
-                            <h2>
+                            <h2 id="order-items-title">
                                 Order Items
                             </h2>
 
@@ -517,7 +514,6 @@ const OrderDetails = () => {
 
                         </div>
 
-
                         <div className="admin-order-items">
 
                             {order.orderItems?.length > 0 ? (
@@ -525,13 +521,12 @@ const OrderDetails = () => {
                                 order.orderItems.map(
                                     (item) => (
 
-                                        <div
+                                        <article
                                             className="admin-order-item"
                                             key={item.id}
                                         >
 
-
-                                            {/* PRODUCT */}
+                                            {/* Product */}
 
                                             <div className="admin-item-info">
 
@@ -546,8 +541,7 @@ const OrderDetails = () => {
 
                                             </div>
 
-
-                                            {/* QUANTITY */}
+                                            {/* Quantity */}
 
                                             <div className="admin-item-detail">
 
@@ -561,8 +555,7 @@ const OrderDetails = () => {
 
                                             </div>
 
-
-                                            {/* PRICE */}
+                                            {/* Price */}
 
                                             <div className="admin-item-detail">
 
@@ -570,21 +563,22 @@ const OrderDetails = () => {
                                                     Price
                                                 </span>
 
-                                                <strong>
-
+                                                <strong
+                                                    aria-label={`Price ₹${Number(
+                                                        item.pricePerUnit
+                                                    ).toLocaleString("en-IN")}`}
+                                                >
                                                     ₹
                                                     {Number(
                                                         item.pricePerUnit
                                                     ).toLocaleString(
                                                         "en-IN"
                                                     )}
-
                                                 </strong>
 
                                             </div>
 
-
-                                            {/* TOTAL */}
+                                            {/* Total */}
 
                                             <div className="admin-item-detail">
 
@@ -592,53 +586,52 @@ const OrderDetails = () => {
                                                     Total
                                                 </span>
 
-                                                <strong>
-
+                                                <strong
+                                                    aria-label={`Item total ₹${Number(
+                                                        item.totalPrice
+                                                    ).toLocaleString("en-IN")}`}
+                                                >
                                                     ₹
                                                     {Number(
                                                         item.totalPrice
                                                     ).toLocaleString(
                                                         "en-IN"
                                                     )}
-
                                                 </strong>
 
                                             </div>
 
-                                        </div>
+                                        </article>
 
                                     )
                                 )
 
                             ) : (
 
-                                <div className="admin-order-items-empty">
-
+                                <p className="admin-order-items-empty">
                                     No items found for this order.
-
-                                </div>
+                                </p>
 
                             )}
 
                         </div>
 
-                    </div>
+                    </section>
 
+                    {/* Payment information */}
 
-                    {/* ==================================================
-                        PAYMENT INFORMATION
-                    ================================================== */}
-
-                    <div className="admin-order-section">
+                    <section
+                        className="admin-order-section"
+                        aria-labelledby="payment-information-title"
+                    >
 
                         <div className="admin-section-header">
 
-                            <h2>
+                            <h2 id="payment-information-title">
                                 Payment Information
                             </h2>
 
                         </div>
-
 
                         <div className="admin-payment-info">
 
@@ -648,7 +641,11 @@ const OrderDetails = () => {
                                     Payment Status
                                 </span>
 
-                                <strong>
+                                <strong
+                                    className={`payment-status ${String(
+                                        order.paymentStatus
+                                    ).toLowerCase()}`}
+                                >
                                     {order.paymentStatus}
                                 </strong>
 
@@ -656,38 +653,37 @@ const OrderDetails = () => {
 
                         </div>
 
-                    </div>
+                    </section>
 
+                    {/* Order total */}
 
-                    {/* ==================================================
-                        ORDER TOTAL
-                    ================================================== */}
-
-                    <div className="admin-order-total">
+                    <div
+                        className="admin-order-total"
+                        aria-label={`Order total ₹${Number(
+                            order.totalAmount
+                        ).toLocaleString("en-IN")}`}
+                    >
 
                         <span>
                             Order Total
                         </span>
 
                         <strong>
-
                             ₹
                             {Number(
                                 order.totalAmount
                             ).toLocaleString(
                                 "en-IN"
                             )}
-
                         </strong>
 
                     </div>
 
                 </div>
 
-            </div>
+            </main>
         </>
     );
 };
-
 
 export default OrderDetails;

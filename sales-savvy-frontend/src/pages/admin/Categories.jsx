@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
     Search,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import AdminNavBar from "../../components/layout/AdminNavbar";
+import ConfirmationDialog from "../../components/common/ConfirmationDialog";
 
 import "../../styles/admin/Categories.css";
 
@@ -38,9 +39,93 @@ function Categories() {
     const [formError, setFormError] = useState("");
     const [saving, setSaving] = useState(false);
 
+    const [operationError, setOperationError] = useState("");
+
+    const [confirmation, setConfirmation] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        confirmText: "Confirm",
+        danger: false,
+        action: null
+    });
+
+    const modalRef = useRef(null);
+
+    // Load categories
     useEffect(() => {
         fetchCategories();
     }, []);
+
+    // Manage modal keyboard accessibility
+    useEffect(() => {
+        if (!showModal) {
+            return;
+        }
+
+        const previousActiveElement = document.activeElement;
+
+        const focusableElements =
+            modalRef.current?.querySelectorAll(
+                'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+            );
+
+        const firstElement = focusableElements?.[0];
+        firstElement?.focus();
+
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") {
+                event.preventDefault();
+
+                if (!saving) {
+                    closeModal();
+                }
+
+                return;
+            }
+
+            if (event.key === "Tab") {
+                const elements =
+                    modalRef.current?.querySelectorAll(
+                        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+                    );
+
+                if (!elements?.length) {
+                    return;
+                }
+
+                const first = elements[0];
+                const last = elements[elements.length - 1];
+
+                if (
+                    event.shiftKey &&
+                    document.activeElement === first
+                ) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (
+                    !event.shiftKey &&
+                    document.activeElement === last
+                ) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            }
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+
+            if (
+                previousActiveElement &&
+                typeof previousActiveElement.focus === "function"
+            ) {
+                previousActiveElement.focus();
+            }
+        };
+    }, [showModal, saving]);
 
     const fetchCategories = async () => {
         try {
@@ -116,7 +201,7 @@ function Categories() {
         });
 
         setFormError("");
-
+        setOperationError("");
         setShowModal(true);
     };
 
@@ -131,7 +216,7 @@ function Categories() {
         });
 
         setFormError("");
-
+        setOperationError("");
         setShowModal(true);
     };
 
@@ -219,25 +304,42 @@ function Categories() {
         }
     };
 
-    const handleToggleStatus = async (category) => {
+    const requestStatusChange = (category) => {
         const newStatus =
             category.status === "ACTIVE"
                 ? "INACTIVE"
                 : "ACTIVE";
 
-        const confirmed = window.confirm(
-            `Are you sure you want to ${
+        setConfirmation({
+            isOpen: true,
+            title:
+                newStatus === "ACTIVE"
+                    ? "Activate category"
+                    : "Deactivate category",
+            message: `Are you sure you want to ${
                 newStatus === "ACTIVE"
                     ? "activate"
                     : "deactivate"
-            } "${category.categoryName}"?`
-        );
+            } "${category.categoryName}"?`,
+            confirmText:
+                newStatus === "ACTIVE"
+                    ? "Activate"
+                    : "Deactivate",
+            danger: newStatus === "INACTIVE",
+            action: () =>
+                handleToggleStatus(category, newStatus)
+        });
+    };
 
-        if (!confirmed) {
-            return;
-        }
+    const handleToggleStatus = async (category, newStatus) => {
+        setConfirmation((previous) => ({
+            ...previous,
+            isOpen: false
+        }));
 
         try {
+            setOperationError("");
+
             const response = await fetch(
                 `${API_URL}/${category.categoryId}/status`,
                 {
@@ -268,18 +370,18 @@ function Categories() {
                 err
             );
 
-            window.alert(
+            setOperationError(
                 err.message ||
                 "Unable to update category status."
             );
         }
     };
 
-    const handleDelete = async (category) => {
+    const requestDelete = (category) => {
         const productCount = getProductCount(category);
 
         if (productCount > 0) {
-            window.alert(
+            setOperationError(
                 `Cannot delete "${category.categoryName}" because it contains ${productCount} product${
                     productCount === 1 ? "" : "s"
                 }.`
@@ -288,15 +390,25 @@ function Categories() {
             return;
         }
 
-        const confirmed = window.confirm(
-            `Are you sure you want to delete "${category.categoryName}"? This action cannot be undone.`
-        );
+        setConfirmation({
+            isOpen: true,
+            title: "Delete category",
+            message: `Are you sure you want to delete "${category.categoryName}"? This action cannot be undone.`,
+            confirmText: "Delete",
+            danger: true,
+            action: () => handleDelete(category)
+        });
+    };
 
-        if (!confirmed) {
-            return;
-        }
+    const handleDelete = async (category) => {
+        setConfirmation((previous) => ({
+            ...previous,
+            isOpen: false
+        }));
 
         try {
+            setOperationError("");
+
             const response = await fetch(
                 `${API_URL}/${category.categoryId}`,
                 {
@@ -321,10 +433,26 @@ function Categories() {
                 err
             );
 
-            window.alert(
+            setOperationError(
                 err.message ||
                 "Unable to delete category."
             );
+        }
+    };
+
+    const closeConfirmation = () => {
+        setConfirmation((previous) => ({
+            ...previous,
+            isOpen: false,
+            action: null
+        }));
+    };
+
+    const handleConfirmation = () => {
+        const action = confirmation.action;
+
+        if (action) {
+            action();
         }
     };
 
@@ -333,13 +461,22 @@ function Categories() {
             <>
                 <AdminNavBar />
 
-                <div className="admin-categories-page">
+                <main
+                    className="admin-categories-page"
+                    aria-labelledby="categories-loading-title"
+                >
                     <div className="admin-categories-container">
-                        <div className="admin-categories-loading">
-                            Loading categories...
+                        <div
+                            className="admin-categories-loading"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <span id="categories-loading-title">
+                                Loading categories...
+                            </span>
                         </div>
                     </div>
-                </div>
+                </main>
             </>
         );
     }
@@ -349,10 +486,13 @@ function Categories() {
             <>
                 <AdminNavBar />
 
-                <div className="admin-categories-page">
+                <main className="admin-categories-page">
                     <div className="admin-categories-container">
-                        <div className="admin-categories-error">
-                            {error}
+                        <div
+                            className="admin-categories-error"
+                            role="alert"
+                        >
+                            <p>{error}</p>
 
                             <button
                                 type="button"
@@ -362,7 +502,7 @@ function Categories() {
                             </button>
                         </div>
                     </div>
-                </div>
+                </main>
             </>
         );
     }
@@ -371,14 +511,19 @@ function Categories() {
         <>
             <AdminNavBar />
 
-            <div className="admin-categories-page">
+            <main
+                className="admin-categories-page"
+                aria-labelledby="categories-page-title"
+            >
                 <div className="admin-categories-container">
 
                     <div className="admin-categories-header">
                         <div>
-                            <h1>Categories</h1>
+                            <h1 id="categories-page-title">
+                                Categories
+                            </h1>
 
-                            <p>
+                            <p aria-live="polite">
                                 {categories.length}{" "}
                                 {categories.length === 1
                                     ? "category"
@@ -391,18 +536,42 @@ function Categories() {
                             className="admin-category-add-button"
                             onClick={openAddModal}
                         >
-                            <Plus size={18} />
+                            <Plus
+                                size={18}
+                                aria-hidden="true"
+                            />
                             Add Category
                         </button>
                     </div>
 
+                    {operationError && (
+                        <div
+                            className="admin-categories-operation-error"
+                            role="alert"
+                            aria-live="assertive"
+                        >
+                            {operationError}
+                        </div>
+                    )}
+
                     <div className="admin-categories-toolbar">
 
                         <div className="admin-categories-search">
-                            <Search size={18} />
+                            <Search
+                                size={18}
+                                aria-hidden="true"
+                            />
+
+                            <label
+                                htmlFor="category-search"
+                                className="visually-hidden"
+                            >
+                                Search categories
+                            </label>
 
                             <input
-                                type="text"
+                                id="category-search"
+                                type="search"
                                 placeholder="Search categories..."
                                 value={search}
                                 onChange={(e) =>
@@ -416,7 +585,10 @@ function Categories() {
                     <div className="categories-summary-grid">
 
                         <div className="category-summary-card">
-                            <div className="category-summary-icon">
+                            <div
+                                className="category-summary-icon"
+                                aria-hidden="true"
+                            >
                                 <FolderOpen size={22} />
                             </div>
 
@@ -430,7 +602,10 @@ function Categories() {
                         </div>
 
                         <div className="category-summary-card">
-                            <div className="category-summary-icon">
+                            <div
+                                className="category-summary-icon"
+                                aria-hidden="true"
+                            >
                                 <Package size={22} />
                             </div>
 
@@ -453,7 +628,10 @@ function Categories() {
                         </div>
 
                         <div className="category-summary-card">
-                            <div className="category-summary-icon">
+                            <div
+                                className="category-summary-icon"
+                                aria-hidden="true"
+                            >
                                 <CheckCircle size={22} />
                             </div>
 
@@ -473,7 +651,10 @@ function Categories() {
                         </div>
 
                         <div className="category-summary-card">
-                            <div className="category-summary-icon">
+                            <div
+                                className="category-summary-icon"
+                                aria-hidden="true"
+                            >
                                 <XCircle size={22} />
                             </div>
 
@@ -500,15 +681,19 @@ function Categories() {
 
                             <table className="categories-table">
 
+                                <caption className="visually-hidden">
+                                    Product categories and their details
+                                </caption>
+
                                 <thead>
                                     <tr>
-                                        <th>Image</th>
-                                        <th>Category</th>
-                                        <th>Description</th>
-                                        <th>Products</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Category</th>
+                                        <th scope="col">Description</th>
+                                        <th scope="col">Products</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Created</th>
+                                        <th scope="col">Actions</th>
                                     </tr>
                                 </thead>
 
@@ -542,9 +727,7 @@ function Categories() {
                                                                     src={
                                                                         category.imageUrl
                                                                     }
-                                                                    alt={
-                                                                        category.categoryName
-                                                                    }
+                                                                    alt={`${category.categoryName} category`}
                                                                     className="category-image"
                                                                     onError={(
                                                                         e
@@ -552,14 +735,19 @@ function Categories() {
                                                                         e.currentTarget.style.display =
                                                                             "none";
 
-                                                                        e.currentTarget.nextElementSibling.style.display =
-                                                                            "flex";
+                                                                        if (
+                                                                            e.currentTarget.nextElementSibling
+                                                                        ) {
+                                                                            e.currentTarget.nextElementSibling.style.display =
+                                                                                "flex";
+                                                                        }
                                                                     }}
                                                                 />
                                                             ) : null}
 
                                                             <div
                                                                 className="category-image-placeholder"
+                                                                aria-hidden="true"
                                                                 style={{
                                                                     display:
                                                                         category.imageUrl
@@ -568,9 +756,7 @@ function Categories() {
                                                                 }}
                                                             >
                                                                 <FolderOpen
-                                                                    size={
-                                                                        22
-                                                                    }
+                                                                    size={22}
                                                                 />
                                                             </div>
 
@@ -603,11 +789,14 @@ function Categories() {
                                                         <span className="category-product-count">
                                                             <Package
                                                                 size={15}
+                                                                aria-hidden="true"
                                                             />
 
-                                                            {getProductCount(
-                                                                category
-                                                            )}
+                                                            <span>
+                                                                {getProductCount(
+                                                                    category
+                                                                )}
+                                                            </span>
                                                         </span>
                                                     </td>
 
@@ -621,24 +810,22 @@ function Categories() {
                                                                     : "category-status-inactive"
                                                             }`}
                                                             onClick={() =>
-                                                                handleToggleStatus(
+                                                                requestStatusChange(
                                                                     category
                                                                 )
                                                             }
-                                                            title="Click to change status"
+                                                            aria-label={`Change ${category.categoryName} status. Current status is ${category.status}.`}
                                                         >
                                                             {category.status ===
                                                             "ACTIVE" ? (
                                                                 <CheckCircle
-                                                                    size={
-                                                                        14
-                                                                    }
+                                                                    size={14}
+                                                                    aria-hidden="true"
                                                                 />
                                                             ) : (
                                                                 <XCircle
-                                                                    size={
-                                                                        14
-                                                                    }
+                                                                    size={14}
+                                                                    aria-hidden="true"
                                                                 />
                                                             )}
 
@@ -667,12 +854,11 @@ function Categories() {
                                                                         category
                                                                     )
                                                                 }
-                                                                title="Edit category"
+                                                                aria-label={`Edit ${category.categoryName} category`}
                                                             >
                                                                 <Pencil
-                                                                    size={
-                                                                        15
-                                                                    }
+                                                                    size={15}
+                                                                    aria-hidden="true"
                                                                 />
                                                             </button>
 
@@ -680,22 +866,21 @@ function Categories() {
                                                                 type="button"
                                                                 className="category-delete-button"
                                                                 onClick={() =>
-                                                                    handleDelete(
+                                                                    requestDelete(
                                                                         category
                                                                     )
                                                                 }
-                                                                title={
+                                                                aria-label={
                                                                     getProductCount(
                                                                         category
                                                                     ) > 0
-                                                                        ? "Cannot delete category with products"
-                                                                        : "Delete category"
+                                                                        ? `Cannot delete ${category.categoryName} because it contains products`
+                                                                        : `Delete ${category.categoryName} category`
                                                                 }
                                                             >
                                                                 <Trash2
-                                                                    size={
-                                                                        15
-                                                                    }
+                                                                    size={15}
+                                                                    aria-hidden="true"
                                                                 />
                                                             </button>
 
@@ -716,29 +901,41 @@ function Categories() {
                     </div>
 
                 </div>
-            </div>
+            </main>
 
             {showModal && (
                 <div
                     className="category-modal-overlay"
+                    role="presentation"
                     onMouseDown={(e) => {
-                        if (e.target === e.currentTarget) {
+                        if (
+                            e.target === e.currentTarget &&
+                            !saving
+                        ) {
                             closeModal();
                         }
                     }}
                 >
-                    <div className="category-modal">
+
+                    <div
+                        ref={modalRef}
+                        className="category-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="category-modal-title"
+                        aria-describedby="category-modal-description"
+                    >
 
                         <div className="category-modal-header">
 
                             <div>
-                                <h2>
+                                <h2 id="category-modal-title">
                                     {editingCategory
                                         ? "Edit Category"
                                         : "Add Category"}
                                 </h2>
 
-                                <p>
+                                <p id="category-modal-description">
                                     {editingCategory
                                         ? "Update category information."
                                         : "Create a new product category."}
@@ -750,8 +947,12 @@ function Categories() {
                                 className="category-modal-close"
                                 onClick={closeModal}
                                 disabled={saving}
+                                aria-label="Close category dialog"
                             >
-                                <X size={20} />
+                                <X
+                                    size={20}
+                                    aria-hidden="true"
+                                />
                             </button>
 
                         </div>
@@ -759,10 +960,15 @@ function Categories() {
                         <form
                             className="category-form"
                             onSubmit={handleSubmit}
+                            noValidate
                         >
 
                             {formError && (
-                                <div className="category-form-error">
+                                <div
+                                    className="category-form-error"
+                                    role="alert"
+                                    aria-live="assertive"
+                                >
                                     {formError}
                                 </div>
                             )}
@@ -786,6 +992,14 @@ function Categories() {
                                     }
                                     disabled={saving}
                                     maxLength={100}
+                                    required
+                                    aria-required="true"
+                                    aria-invalid={
+                                        formError &&
+                                        !formData.categoryName.trim()
+                                            ? "true"
+                                            : "false"
+                                    }
                                 />
 
                             </div>
@@ -830,9 +1044,10 @@ function Categories() {
                                         handleInputChange
                                     }
                                     disabled={saving}
+                                    aria-describedby="image-url-help"
                                 />
 
-                                <small>
+                                <small id="image-url-help">
                                     Optional. Use a publicly accessible image URL.
                                 </small>
 
@@ -892,8 +1107,20 @@ function Categories() {
                         </form>
 
                     </div>
+
                 </div>
             )}
+
+            <ConfirmationDialog
+                isOpen={confirmation.isOpen}
+                title={confirmation.title}
+                message={confirmation.message}
+                confirmText={confirmation.confirmText}
+                cancelText="Cancel"
+                danger={confirmation.danger}
+                onConfirm={handleConfirmation}
+                onCancel={closeConfirmation}
+            />
         </>
     );
 }

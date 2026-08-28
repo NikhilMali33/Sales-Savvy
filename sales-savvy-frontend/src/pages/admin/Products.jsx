@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { getAllProducts, deleteProduct } from "../../services/adminService";
 import "../../styles/admin/Products.css";
 import AdminNavbar from "../../components/layout/AdminNavbar";
+import ConfirmationDialog from "../../components/common/ConfirmationDialog";
 
 function Products() {
 
@@ -15,6 +16,12 @@ function Products() {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const [deleteDialog, setDeleteDialog] = useState({
+        isOpen: false,
+        productId: null,
+        productName: ""
+    });
 
     useEffect(() => {
         fetchProducts();
@@ -46,26 +53,39 @@ function Products() {
     };
 
     const handleAddProduct = () => {
-
         navigate("/admin/products/add");
-
     };
 
     const handleEditProduct = (productId) => {
-
         navigate(`/admin/products/edit/${productId}`);
+    };
+
+    // Open delete confirmation
+    const handleDeleteProduct = (productId, productName) => {
+
+        setDeleteDialog({
+            isOpen: true,
+            productId,
+            productName
+        });
 
     };
 
-    const handleDeleteProduct = async (productId, productName) => {
+    // Close delete confirmation
+    const handleCancelDelete = () => {
 
-        const confirmed = window.confirm(
-            `Are you sure you want to delete "${productName}"?`
-        );
+        setDeleteDialog({
+            isOpen: false,
+            productId: null,
+            productName: ""
+        });
 
-        if (!confirmed) {
-            return;
-        }
+    };
+
+    // Delete product after confirmation
+    const handleConfirmDelete = async () => {
+
+        const { productId } = deleteDialog;
 
         try {
 
@@ -77,11 +97,15 @@ function Products() {
                 )
             );
 
+            handleCancelDelete();
+
         } catch (error) {
 
             console.error("Error deleting product:", error);
 
-            alert("Failed to delete product.");
+            setError("Failed to delete product.");
+
+            handleCancelDelete();
 
         }
 
@@ -97,272 +121,306 @@ function Products() {
 
         <>
             <AdminNavbar />
+
             <div className="products-container">
 
-            {/* Header */}
+                {/* Header */}
 
-            <div className="products-header">
+                <div className="products-header">
 
-                <div>
-                    <h2>Products</h2>
+                    <div>
+                        <h1>Products</h1>
 
-                    <p className="products-count">
-                        {products.length} product
-                        {products.length !== 1 ? "s" : ""}
-                    </p>
-                </div>
-
-                <button
-                    className="add-product-btn"
-                    onClick={handleAddProduct}
-                >
-                    <Plus size={18} />
-                    Add Product
-                </button>
-
-            </div>
-
-
-            {/* Search */}
-
-            <div className="products-search">
-
-                <Search
-                    size={18}
-                    className="search-icon"
-                />
-
-                <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-box"
-                />
-
-            </div>
-
-
-            {/* Loading */}
-
-            {loading && (
-
-                <div className="products-message">
-                    Loading products...
-                </div>
-
-            )}
-
-
-            {/* Error */}
-
-            {!loading && error && (
-
-                <div className="products-message error-message">
-
-                    <p>{error}</p>
+                        <p className="products-count">
+                            {products.length} product
+                            {products.length !== 1 ? "s" : ""}
+                        </p>
+                    </div>
 
                     <button
-                        onClick={fetchProducts}
-                        className="retry-btn"
+                        type="button"
+                        className="add-product-btn"
+                        onClick={handleAddProduct}
                     >
-                        Try Again
+                        <Plus size={18} aria-hidden="true" />
+                        <span>Add Product</span>
                     </button>
 
                 </div>
 
-            )}
+                {/* Search */}
 
+                <div className="products-search">
 
-            {/* Table */}
+                    <label
+                        htmlFor="product-search"
+                        className="visually-hidden"
+                    >
+                        Search products
+                    </label>
 
-            {!loading && !error && (
+                    <Search
+                        size={18}
+                        className="search-icon"
+                        aria-hidden="true"
+                    />
 
-                <div className="table-container">
+                    <input
+                        id="product-search"
+                        type="search"
+                        placeholder="Search products..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="search-box"
+                    />
 
-                    <table className="products-table">
+                </div>
 
-                        <thead>
+                {/* Loading */}
 
-                            <tr>
+                {loading && (
 
-                                <th>Image</th>
-                                <th>Product</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                    <div
+                        className="products-message"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        Loading products...
+                    </div>
 
-                            </tr>
+                )}
 
-                        </thead>
+                {/* Error */}
 
+                {!loading && error && (
 
-                        <tbody>
+                    <div
+                        className="products-message error-message"
+                        role="alert"
+                    >
 
-                            {filteredProducts.length > 0 ? (
+                        <p>{error}</p>
 
-                                filteredProducts.map((product) => (
+                        <button
+                            type="button"
+                            onClick={fetchProducts}
+                            className="retry-btn"
+                        >
+                            Try Again
+                        </button>
 
-                                    <tr key={product.productId}>
+                    </div>
 
-                                        {/* Image */}
+                )}
 
-                                        <td>
+                {/* Table */}
 
-                                            {product.imageUrls &&
-                                            product.imageUrls.length > 0 ? (
+                {!loading && !error && (
 
-                                                <img
-                                                    src={product.imageUrls[0]}
-                                                    alt={product.productName}
-                                                    className="product-image"
-                                                />
+                    <div className="table-container">
 
-                                            ) : (
+                        <table className="products-table">
 
-                                                <div className="no-image">
-                                                    No Image
+                            <caption className="visually-hidden">
+                                Product inventory
+                            </caption>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th scope="col">Image</th>
+                                    <th scope="col">Product</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Stock</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {filteredProducts.length > 0 ? (
+
+                                    filteredProducts.map((product) => (
+
+                                        <tr key={product.productId}>
+
+                                            {/* Image */}
+
+                                            <td>
+
+                                                {product.imageUrls &&
+                                                product.imageUrls.length > 0 ? (
+
+                                                    <img
+                                                        src={product.imageUrls[0]}
+                                                        alt={`${product.productName} product`}
+                                                        className="product-image"
+                                                    />
+
+                                                ) : (
+
+                                                    <span className="no-image">
+                                                        No Image
+                                                    </span>
+
+                                                )}
+
+                                            </td>
+
+                                            {/* Product */}
+
+                                            <td>
+
+                                                <div className="product-name-cell">
+
+                                                    <strong>
+                                                        {product.productName}
+                                                    </strong>
+
                                                 </div>
 
-                                            )}
+                                            </td>
 
-                                        </td>
+                                            {/* Category */}
 
+                                            <td>
+                                                {product.categoryName || "-"}
+                                            </td>
 
-                                        {/* Product */}
+                                            {/* Price */}
 
-                                        <td>
+                                            <td>
+                                                ₹ {product.price}
+                                            </td>
 
-                                            <div className="product-name-cell">
+                                            {/* Stock */}
 
-                                                <strong>
-                                                    {product.productName}
-                                                </strong>
+                                            <td>
 
-                                            </div>
-
-                                        </td>
-
-
-                                        {/* Category */}
-
-                                        <td>
-                                            {product.categoryName || "-"}
-                                        </td>
-
-
-                                        {/* Price */}
-
-                                        <td>
-                                            ₹ {product.price}
-                                        </td>
-
-
-                                        {/* Stock */}
-
-                                        <td>
-
-                                            <span
-                                                className={
-                                                    product.stockQuantity > 0
-                                                        ? "stock-available"
-                                                        : "stock-out"
-                                                }
-                                            >
-                                                {product.stockQuantity}
-                                            </span>
-
-                                        </td>
-
-
-                                        {/* Status */}
-
-                                        <td>
-
-                                            <span
-                                                className={
-                                                    product.status === "ACTIVE"
-                                                        ? "status-active"
-                                                        : "status-inactive"
-                                                }
-                                            >
-                                                {product.status}
-                                            </span>
-
-                                        </td>
-
-
-                                        {/* Actions */}
-
-                                        <td>
-
-                                            <div className="action-buttons">
-
-                                                <button
-                                                    className="action-btn edit-btn"
-                                                    title="Edit Product"
-                                                    onClick={() =>
-                                                        handleEditProduct(
-                                                            product.productId
-                                                        )
+                                                <span
+                                                    className={
+                                                        product.stockQuantity > 0
+                                                            ? "stock-available"
+                                                            : "stock-out"
                                                     }
                                                 >
-                                                    <Pencil size={16} />
-                                                </button>
+                                                    {product.stockQuantity}
+                                                </span>
 
+                                            </td>
 
-                                                <button
-                                                    className="action-btn delete-btn"
-                                                    title="Delete Product"
-                                                    onClick={() =>
-                                                        handleDeleteProduct(
-                                                            product.productId,
-                                                            product.productName
-                                                        )
+                                            {/* Status */}
+
+                                            <td>
+
+                                                <span
+                                                    className={
+                                                        product.status === "ACTIVE"
+                                                            ? "status-active"
+                                                            : "status-inactive"
                                                     }
                                                 >
-                                                    <Trash2 size={16} />
-                                                </button>
+                                                    {product.status}
+                                                </span>
 
-                                            </div>
+                                            </td>
+
+                                            {/* Actions */}
+
+                                            <td>
+
+                                                <div className="action-buttons">
+
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn edit-btn"
+                                                        aria-label={`Edit ${product.productName}`}
+                                                        title={`Edit ${product.productName}`}
+                                                        onClick={() =>
+                                                            handleEditProduct(
+                                                                product.productId
+                                                            )
+                                                        }
+                                                    >
+                                                        <Pencil
+                                                            size={16}
+                                                            aria-hidden="true"
+                                                        />
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        className="action-btn delete-btn"
+                                                        aria-label={`Delete ${product.productName}`}
+                                                        title={`Delete ${product.productName}`}
+                                                        onClick={() =>
+                                                            handleDeleteProduct(
+                                                                product.productId,
+                                                                product.productName
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2
+                                                            size={16}
+                                                            aria-hidden="true"
+                                                        />
+                                                    </button>
+
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+
+                                    ))
+
+                                ) : (
+
+                                    <tr>
+
+                                        <td
+                                            colSpan="7"
+                                            className="no-data"
+                                        >
+
+                                            {searchTerm
+                                                ? "No products match your search."
+                                                : "No products found."}
 
                                         </td>
 
                                     </tr>
 
-                                ))
+                                )}
 
-                            ) : (
+                            </tbody>
 
-                                <tr>
+                        </table>
 
-                                    <td
-                                        colSpan="7"
-                                        className="no-data"
-                                    >
+                    </div>
 
-                                        {searchTerm
-                                            ? "No products match your search."
-                                            : "No products found."
-                                        }
+                )}
 
-                                    </td>
+            </div>
 
-                                </tr>
+            {/* Delete Confirmation */}
 
-                            )}
+            <ConfirmationDialog
+                isOpen={deleteDialog.isOpen}
+                title="Delete Product"
+                message={`Are you sure you want to delete "${deleteDialog.productName}"? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                danger={true}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+            />
 
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            )}
-
-        </div>
         </>
 
     );

@@ -19,6 +19,8 @@ function Navbar() {
     const [profileOpen, setProfileOpen] = useState(false);
 
     const profileRef = useRef(null);
+    const profileButtonRef = useRef(null);
+    const firstDropdownItemRef = useRef(null);
 
 
     // ============================================================
@@ -64,17 +66,14 @@ function Navbar() {
 
         loadCartCount();
 
-
         const handleCartUpdate = () => {
             loadCartCount();
         };
-
 
         window.addEventListener(
             "cartUpdated",
             handleCartUpdate
         );
-
 
         return () => {
 
@@ -107,12 +106,10 @@ function Navbar() {
 
         };
 
-
         document.addEventListener(
             "mousedown",
             handleClickOutside
         );
-
 
         return () => {
 
@@ -124,6 +121,57 @@ function Navbar() {
         };
 
     }, []);
+
+
+    // ============================================================
+    // CLOSE DROPDOWN WITH ESCAPE KEY
+    // ============================================================
+
+    useEffect(() => {
+
+        const handleEscape = (event) => {
+
+            if (event.key === "Escape" && profileOpen) {
+
+                setProfileOpen(false);
+
+                // Return focus to profile button
+                profileButtonRef.current?.focus();
+
+            }
+
+        };
+
+        document.addEventListener(
+            "keydown",
+            handleEscape
+        );
+
+        return () => {
+
+            document.removeEventListener(
+                "keydown",
+                handleEscape
+            );
+
+        };
+
+    }, [profileOpen]);
+
+
+    // ============================================================
+    // MOVE FOCUS TO FIRST DROPDOWN ITEM
+    // ============================================================
+
+    useEffect(() => {
+
+        if (profileOpen) {
+
+            firstDropdownItemRef.current?.focus();
+
+        }
+
+    }, [profileOpen]);
 
 
     // ============================================================
@@ -142,7 +190,6 @@ function Navbar() {
                 }
             );
 
-
             if (!response.ok) {
 
                 throw new Error(
@@ -151,12 +198,10 @@ function Navbar() {
 
             }
 
-
             // Close dropdown
             setProfileOpen(false);
 
-
-            // Redirect to login
+            // Redirect to products
             navigate("/products");
 
         } catch (error) {
@@ -176,12 +221,28 @@ function Navbar() {
 
 
     // ============================================================
+    // TOGGLE PROFILE MENU
+    // ============================================================
+
+    const handleProfileToggle = () => {
+
+        setProfileOpen(
+            previous => !previous
+        );
+
+    };
+
+
+    // ============================================================
     // NAVBAR
     // ============================================================
 
     return (
 
-        <nav className="navbar">
+        <nav
+            className="navbar"
+            aria-label="Main navigation"
+        >
 
             {/* ====================================================
                 LOGO
@@ -190,8 +251,17 @@ function Navbar() {
             <Link
                 to="/products"
                 className="navbar-logo"
+                aria-label="SalesSavvy home"
             >
-                🛍 SalesSavvy
+
+                <span aria-hidden="true">
+                    🛍
+                </span>
+
+                <span>
+                    SalesSavvy
+                </span>
+
             </Link>
 
 
@@ -211,7 +281,10 @@ function Navbar() {
                     className="navbar-link"
                 >
 
-                    <span className="navbar-link-icon">
+                    <span
+                        className="navbar-link-icon"
+                        aria-hidden="true"
+                    >
                         📦
                     </span>
 
@@ -232,19 +305,19 @@ function Navbar() {
                 >
 
                     <button
+                        ref={profileButtonRef}
                         type="button"
                         className="profile-button"
-                        onClick={() =>
-                            setProfileOpen(
-                                previous =>
-                                    !previous
-                            )
-                        }
-                        aria-label="Open profile menu"
+                        onClick={handleProfileToggle}
+                        aria-label="Profile menu"
                         aria-expanded={profileOpen}
+                        aria-controls="profile-menu"
                     >
 
-                        <UserCircle size={28} />
+                        <UserCircle
+                            size={28}
+                            aria-hidden="true"
+                        />
 
                         <span>
                             Profile
@@ -259,12 +332,17 @@ function Navbar() {
 
                     {profileOpen && (
 
-                        <div className="profile-dropdown">
+                        <div
+                            id="profile-menu"
+                            className="profile-dropdown"
+                            aria-label="Profile options"
+                        >
 
 
                             {/* PROFILE */}
 
                             <Link
+                                ref={firstDropdownItemRef}
                                 to="/profile"
                                 className="profile-dropdown-item"
                                 onClick={() =>
@@ -272,7 +350,10 @@ function Navbar() {
                                 }
                             >
 
-                                <User size={18} />
+                                <User
+                                    size={18}
+                                    aria-hidden="true"
+                                />
 
                                 <span>
                                     My Profile
@@ -289,7 +370,10 @@ function Navbar() {
                                 onClick={handleLogout}
                             >
 
-                                <LogOut size={18} />
+                                <LogOut
+                                    size={18}
+                                    aria-hidden="true"
+                                />
 
                                 <span>
                                     Logout
@@ -312,15 +396,26 @@ function Navbar() {
                 <Link
                     to="/cart"
                     className="cart-link"
+                    aria-label={
+                        cartCount > 0
+                            ? `Cart, ${cartCount} ${cartCount === 1 ? "item" : "items"}`
+                            : "Cart, empty"
+                    }
                 >
 
                     <div className="cart-icon-wrapper">
 
-                        <ShoppingCart size={28} />
+                        <ShoppingCart
+                            size={28}
+                            aria-hidden="true"
+                        />
 
                         {cartCount > 0 && (
 
-                            <span className="cart-badge">
+                            <span
+                                className="cart-badge"
+                                aria-hidden="true"
+                            >
                                 {cartCount}
                             </span>
 

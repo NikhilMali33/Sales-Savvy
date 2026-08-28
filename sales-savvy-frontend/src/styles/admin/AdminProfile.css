@@ -1,515 +1,293 @@
-/* ============================================================
-   ADMIN PROFILE PAGE
-   ============================================================ */
-
 .admin-profile-page {
-
     min-height: calc(100vh - 70px);
-
     padding: 40px 30px 60px;
-
     background: #f5f6f8;
-
     box-sizing: border-box;
 }
 
-
-/* ============================================================
-   CONTAINER
-   ============================================================ */
-
 .admin-profile-container {
-
     max-width: 1000px;
-
     margin: 0 auto;
 }
 
-
-/* ============================================================
-   BACK LINK
-   ============================================================ */
-
 .admin-profile-back-link {
-
     display: inline-flex;
-
     align-items: center;
-
     gap: 7px;
-
     margin-bottom: 28px;
-
-    color: #64748b;
-
+    color: #475569;
     text-decoration: none;
-
     font-size: 14px;
-
-    transition: color 0.2s ease;
+    font-weight: 500;
+    border-radius: 6px;
 }
 
-
 .admin-profile-back-link:hover {
-
     color: #2563eb;
 }
 
-
-/* ============================================================
-   HEADER
-   ============================================================ */
+.admin-profile-back-link:focus-visible,
+.admin-profile-back-btn:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.45);
+    outline-offset: 3px;
+}
 
 .admin-profile-header {
-
     display: flex;
-
     align-items: center;
-
     gap: 20px;
-
     margin-bottom: 30px;
 }
 
-
-/* ============================================================
-   AVATAR
-   ============================================================ */
-
 .admin-profile-avatar {
-
     width: 100px;
-
     height: 100px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     flex-shrink: 0;
-
     border-radius: 50%;
-
     background: #e8eef8;
-
     color: #2563eb;
-
     border: 1px solid #dbe5f1;
 }
 
-
-/* ============================================================
-   HEADER CONTENT
-   ============================================================ */
-
 .admin-profile-heading {
-
     display: flex;
-
     flex-direction: column;
-
     gap: 5px;
 }
 
-
-/* ============================================================
-   TITLE ROW
-   ============================================================ */
-
 .admin-profile-title-row {
-
     display: flex;
-
     align-items: center;
-
     gap: 12px;
 }
 
-
 .admin-profile-title-row h1 {
-
     margin: 0;
-
     font-size: 32px;
-
     font-weight: 700;
-
     color: #172554;
 }
 
-
-/* ============================================================
-   ADMIN BADGE
-   ============================================================ */
-
 .admin-profile-badge {
-
     display: inline-flex;
-
     align-items: center;
-
     padding: 5px 9px;
-
     border-radius: 6px;
-
     background: #dbeafe;
-
     color: #1d4ed8;
-
     font-size: 10px;
-
     font-weight: 700;
-
     letter-spacing: 0.4px;
 }
 
-
-/* ============================================================
-   HEADER DESCRIPTION
-   ============================================================ */
-
 .admin-profile-heading p {
-
     margin: 0;
-
-    color: #64748b;
-
+    color: #475569;
     font-size: 14px;
 }
 
-
-/* ============================================================
-   PROFILE CARD
-   ============================================================ */
-
 .admin-profile-card {
-
     background: #ffffff;
-
     border-radius: 14px;
-
-    box-shadow:
-        0 3px 12px rgba(15, 23, 42, 0.06);
-
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
     overflow: hidden;
-
     margin-bottom: 20px;
 }
 
-
-/* ============================================================
-   PROFILE INFO ROW
-   ============================================================ */
-
 .admin-profile-info-row {
-
     display: flex;
-
     align-items: center;
-
     gap: 18px;
-
     padding: 22px 24px;
-
     border-bottom: 1px solid #f1f5f9;
 }
 
-
 .admin-profile-info-row:last-child {
-
     border-bottom: none;
 }
 
-
-/* ============================================================
-   INFO ICON
-   ============================================================ */
-
 .admin-profile-info-icon {
-
     width: 46px;
-
     height: 46px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     flex-shrink: 0;
-
     border-radius: 10px;
-
     background: #e8eef8;
-
     color: #2563eb;
 }
 
-
-/* ============================================================
-   INFO CONTENT
-   ============================================================ */
-
 .admin-profile-info-content {
-
     display: flex;
-
     flex-direction: column;
-
     gap: 5px;
+    min-width: 0;
 }
 
-
 .admin-profile-info-content span {
-
     font-size: 12px;
-
     color: #64748b;
 }
 
-
 .admin-profile-info-content strong {
-
     font-size: 15px;
-
     font-weight: 600;
-
     color: #0f172a;
+    overflow-wrap: anywhere;
 }
 
-
-/* ============================================================
-   ADMIN ROLE
-   ============================================================ */
-
 .admin-profile-role {
-
     color: #2563eb !important;
-
     text-transform: uppercase;
-
     font-size: 13px !important;
 }
 
-
-/* ============================================================
-   ACCOUNT NOTE
-   ============================================================ */
-
 .admin-profile-account-note {
-
     display: flex;
-
     align-items: center;
-
     gap: 10px;
-
     padding: 16px 18px;
-
     background: #eff6ff;
-
     border: 1px solid #dbeafe;
-
     border-radius: 10px;
-
     color: #1d4ed8;
-
     font-size: 13px;
+    line-height: 1.5;
 }
 
-
 .admin-profile-account-note svg {
-
     flex-shrink: 0;
 }
 
-
-/* ============================================================
-   LOADING
-   ============================================================ */
-
 .admin-profile-loading {
-
     min-height: 400px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
-    color: #64748b;
-
+    color: #475569;
     font-size: 16px;
 }
 
-
-/* ============================================================
-   ERROR
-   ============================================================ */
-
 .admin-profile-error {
-
     max-width: 500px;
-
     margin: 80px auto;
-
     padding: 40px;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     text-align: center;
-
     background: #ffffff;
-
     border-radius: 14px;
-
-    box-shadow:
-        0 3px 12px rgba(15, 23, 42, 0.06);
-
-    color: #64748b;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+    color: #475569;
 }
 
-
 .admin-profile-error svg {
-
     color: #dc2626;
-
     margin-bottom: 15px;
 }
 
-
-.admin-profile-error h2 {
-
+.admin-profile-error h1 {
     margin: 0 0 8px;
-
     color: #0f172a;
-
     font-size: 22px;
 }
 
-
 .admin-profile-error p {
-
     margin: 0 0 22px;
-
     font-size: 14px;
+    line-height: 1.5;
 }
-
-
-/* ============================================================
-   ERROR BACK BUTTON
-   ============================================================ */
 
 .admin-profile-back-btn {
-
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
     padding: 10px 18px;
-
     background: #2563eb;
-
     color: white;
-
     text-decoration: none;
-
     border-radius: 7px;
-
     font-size: 14px;
-
     font-weight: 600;
-
-    transition: background 0.2s ease;
 }
 
-
 .admin-profile-back-btn:hover {
-
     background: #1d4ed8;
 }
 
+.admin-profile-back-btn:focus-visible {
+    background: #1d4ed8;
+}
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
 
 @media (max-width: 650px) {
-
     .admin-profile-page {
-
         padding: 25px 16px 40px;
     }
 
-
     .admin-profile-header {
-
         align-items: flex-start;
-
         gap: 15px;
     }
 
-
     .admin-profile-avatar {
-
         width: 75px;
-
         height: 75px;
     }
 
-
     .admin-profile-avatar svg {
-
         width: 52px;
-
         height: 52px;
     }
 
-
     .admin-profile-title-row {
-
         flex-wrap: wrap;
-
         gap: 8px;
     }
 
-
     .admin-profile-title-row h1 {
-
         font-size: 27px;
     }
 
-
     .admin-profile-info-row {
-
         padding: 18px;
-
         gap: 14px;
     }
 
-
     .admin-profile-info-icon {
-
         width: 42px;
-
         height: 42px;
     }
 
-
     .admin-profile-account-note {
-
         align-items: flex-start;
+    }
 
-        line-height: 1.5;
+    .admin-profile-error {
+        margin: 50px auto;
+        padding: 30px 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-profile-back-link,
+    .admin-profile-back-btn {
+        transition: none;
     }
 }

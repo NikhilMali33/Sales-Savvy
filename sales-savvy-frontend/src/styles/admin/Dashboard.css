@@ -112,6 +112,11 @@
     background: #dbeafe;
 }
 
+.dashboard-view-all:focus-visible {
+    outline: 3px solid #1d4ed8;
+    outline-offset: 3px;
+}
+
 .order-status-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -145,7 +150,24 @@
 
 .sales-chart-wrapper {
     width: 100%;
+    min-height: 320px;
+}
+
+.sales-chart {
+    width: 100%;
     height: 320px;
+}
+
+.dashboard-chart-data {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .dashboard-content-grid {
@@ -325,6 +347,18 @@
     outline: none;
 }
 
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 @media (max-width: 1000px) {
 
     .dashboard-stats-grid {
@@ -370,8 +404,10 @@
         flex-shrink: 0;
     }
 
-    .sales-chart-wrapper {
+    .sales-chart-wrapper,
+    .sales-chart {
         height: 260px;
+        min-height: 260px;
     }
 }
 
@@ -389,7 +425,21 @@
         align-self: flex-start;
     }
 
-    .sales-chart-wrapper {
+    .sales-chart-wrapper,
+    .sales-chart {
         height: 240px;
+        min-height: 240px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }

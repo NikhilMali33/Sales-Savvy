@@ -1,425 +1,724 @@
-/* ==========================
-   Google Font
-========================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* ==========================
-   Reset
-========================== */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
-    font-family:'Inter',sans-serif;
-    background:#f5f7fb;
-    color:#1f2937;
+html {
+    scroll-behavior: smooth;
 }
 
-/* ==========================
-   Main Layout
-========================== */
-
-.auth-container{
-    width:100%;
-    min-height:100vh;
-
-    display:grid;
-    grid-template-columns:1fr 1fr;
-
-    align-items:center;
-    gap:40px;
-
-    max-width:1300px;
-    margin:auto;
-
-    padding:40px;
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f5f7fb;
+    color: #1f2937;
 }
+
 
 /* ==========================
-   Left Panel
+   MAIN AUTH LAYOUT
 ========================== */
 
-.left-panel{
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
+.auth-container {
+    width: 100%;
+    min-height: 100vh;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    align-items: center;
+    gap: 40px;
+
+    max-width: 1300px;
+    margin: 0 auto;
+
+    padding: 40px;
 }
 
-.logo{
-    display:flex;
-    align-items:center;
-    gap:10px;
-
-    font-size:28px;
-    font-weight:700;
-    color:#2563eb;
-
-    margin-bottom:30px;
-}
-
-.login-image{
-
-    width:100%;
-    max-width:320px;
-
-    margin-bottom:30px;
-}
-
-.left-panel h1{
-
-    font-size:42px;
-    font-weight:700;
-
-    margin-bottom:18px;
-
-    color:#111827;
-}
-
-.description{
-
-    color:#6b7280;
-
-    line-height:1.7;
-
-    font-size:16px;
-
-    max-width:500px;
-
-    margin-bottom:35px;
-}
 
 /* ==========================
-   Features
+   LEFT PANEL
 ========================== */
 
-.features{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:18px;
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.feature{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-
-    font-size:15px;
-
-    color:#374151;
-}
-
-.feature svg{
-
-    color:#2563eb;
-
-    flex-shrink:0;
-}
 
 /* ==========================
-   Right Panel
+   LOGO
 ========================== */
 
-.right-panel{
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
-    display:flex;
+    font-size: 28px;
+    font-weight: 700;
 
-    justify-content:center;
+    color: #1d4ed8;
 
-    align-items:center;
+    margin-bottom: 30px;
 }
 
+
 /* ==========================
-   Card
+   ILLUSTRATION
 ========================== */
 
-.login-card{
+.login-image {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
 
-    width:100%;
+    margin-bottom: 30px;
+}
 
-    max-width:400px;
 
-    background:white;
+/* ==========================
+   LEFT HEADING
+========================== */
 
-    padding:40px;
+.left-panel h1 {
+    font-size: 42px;
+    font-weight: 700;
 
-    border-radius:16px;
+    margin-bottom: 18px;
+
+    color: #111827;
+}
+
+
+/* ==========================
+   DESCRIPTION
+========================== */
+
+.description {
+    color: #4b5563;
+
+    line-height: 1.7;
+
+    font-size: 16px;
+
+    max-width: 500px;
+
+    margin-bottom: 35px;
+}
+
+
+/* ==========================
+   FEATURES
+========================== */
+
+.features {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    font-size: 15px;
+
+    color: #374151;
+}
+
+.feature svg {
+    color: #1d4ed8;
+    flex-shrink: 0;
+}
+
+
+/* ==========================
+   RIGHT PANEL
+========================== */
+
+.right-panel {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* ==========================
+   AUTH CARD
+========================== */
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+
+    background: #ffffff;
+
+    padding: 40px;
+
+    border-radius: 16px;
 
     box-shadow:
-        0 10px 25px rgba(0,0,0,.08);
+        0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
-.login-card h2{
-
-    font-size:32px;
-
-    margin-bottom:10px;
-
-    color:#111827;
-}
-
-.subtitle{
-
-    color:#6b7280;
-
-    margin-bottom:28px;
-
-    line-height:1.6;
-}
 
 /* ==========================
-   Labels
+   CARD HEADING
 ========================== */
 
-label{
+.login-card h2 {
+    font-size: 32px;
 
-    display:block;
+    margin-bottom: 10px;
 
-    margin-bottom:8px;
+    color: #111827;
 
-    margin-top:18px;
-
-    font-weight:600;
-
-    color:#374151;
+    line-height: 1.3;
 }
+
 
 /* ==========================
-   Inputs
+   SUBTITLE
 ========================== */
 
-.input-box{
+.subtitle {
+    color: #4b5563;
 
-    display:flex;
+    margin-bottom: 28px;
 
-    align-items:center;
-
-    gap:10px;
-
-    height:52px;
-
-    border:1px solid #d1d5db;
-
-    border-radius:10px;
-
-    padding:0 15px;
-
-    transition:.25s;
+    line-height: 1.6;
 }
 
-.input-box:focus-within{
 
-    border-color:#2563eb;
+/* ==========================
+   FORM LABELS
+========================== */
 
-    box-shadow:0 0 0 3px rgba(37,99,235,.15);
+.login-card label {
+    display: block;
+
+    margin-top: 18px;
+    margin-bottom: 8px;
+
+    font-weight: 600;
+
+    color: #374151;
+
+    line-height: 1.4;
 }
 
-.input-box svg{
 
-    color:#6b7280;
+/* ==========================
+   INPUT CONTAINER
+========================== */
+
+.input-box {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 52px;
+
+    border: 1px solid #9ca3af;
+
+    border-radius: 10px;
+
+    padding: 0 15px;
+
+    background: #ffffff;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.input-box input{
 
-    flex:1;
+/* Icon */
 
-    border:none;
+.input-box > svg {
+    color: #4b5563;
 
-    outline:none;
-
-    background:transparent;
-
-    font-size:15px;
+    flex-shrink: 0;
 }
-.input-box select {
+
+
+/* ==========================
+   INPUT FOCUS
+========================== */
+
+.input-box:focus-within {
+    border-color: #1d4ed8;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+
+/* ==========================
+   INPUT
+========================== */
+
+.input-box input {
     flex: 1;
+
+    min-width: 0;
+
+    width: 100%;
+
     border: none;
     outline: none;
+
     background: transparent;
-    font-size: 15px;
+
+    color: #111827;
+
     font-family: inherit;
-    color: #374151;
+
+    font-size: 16px;
+
+    line-height: 1.5;
+}
+
+
+/* Placeholder */
+
+.input-box input::placeholder {
+    color: #6b7280;
+
+    opacity: 1;
+}
+
+
+/* ==========================
+   SELECT
+========================== */
+
+.input-box select {
+    flex: 1;
+
+    min-width: 0;
+
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    font-size: 16px;
+
+    font-family: inherit;
+
+    color: #111827;
+
     cursor: pointer;
 }
 
-.eye-btn{
-
-    border:none;
-
-    background:none;
-
-    cursor:pointer;
-
-    display:flex;
-
-    align-items:center;
-}
 
 /* ==========================
-   Button
+   PASSWORD VISIBILITY BUTTON
 ========================== */
 
-.login-btn{
+.eye-btn {
+    width: 44px;
+    min-width: 44px;
 
-    width:100%;
+    height: 44px;
+    min-height: 44px;
 
-    height:52px;
+    padding: 8px;
 
-    margin-top:30px;
+    border: none;
 
-    border:none;
+    border-radius: 6px;
 
-    border-radius:10px;
+    background: transparent;
 
-    background:#2563eb;
+    color: #374151;
 
-    color:white;
+    display: inline-flex;
 
-    font-size:16px;
+    align-items: center;
+    justify-content: center;
 
-    font-weight:600;
+    cursor: pointer;
 
-    cursor:pointer;
-
-    transition:.25s;
+    flex-shrink: 0;
 }
+
+
+/* Hover */
+
+.eye-btn:hover {
+    background: #f3f4f6;
+}
+
+
+/* Focus */
+
+.eye-btn:focus-visible {
+    outline: 3px solid #1d4ed8;
+
+    outline-offset: 2px;
+
+    background: #eff6ff;
+}
+
+
+/* ==========================
+   MAIN BUTTON
+========================== */
+
+.login-btn {
+    width: 100%;
+
+    min-height: 52px;
+
+    margin-top: 30px;
+
+    padding: 12px 20px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #1d4ed8;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    line-height: 1.4;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+/* Hover */
+
+.login-btn:hover {
+    background: #1e40af;
+}
+
+
+/* Keyboard focus */
+
+.login-btn:focus-visible {
+    outline: 3px solid #111827;
+
+    outline-offset: 3px;
+}
+
+
+/* Disabled */
+
+.login-btn:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* ==========================
+   LINKS
+========================== */
 
 .forgot-password {
     text-align: right;
+
     margin: 12px 0;
 }
 
-.forgot-password a {
-    color: #2563eb;
+.forgot-password a,
+.register-link a {
+    color: #1d4ed8;
+
     text-decoration: none;
+
     font-size: 14px;
-    font-weight: 500;
+
+    font-weight: 600;
 }
 
-.forgot-password a:hover {
+
+/* Hover */
+
+.forgot-password a:hover,
+.register-link a:hover {
     text-decoration: underline;
 }
 
-.login-btn:hover{
 
-    background:#1d4ed8;
+/* Keyboard focus */
+
+.forgot-password a:focus-visible,
+.register-link a:focus-visible {
+    outline: 3px solid #1d4ed8;
+
+    outline-offset: 3px;
+
+    border-radius: 3px;
 }
+
 
 /* ==========================
-   Register Link
+   REGISTER / BACK LINK
 ========================== */
 
-.register-link{
+.register-link {
+    margin-top: 24px;
 
-    margin-top:24px;
+    text-align: center;
 
-    text-align:center;
+    color: #4b5563;
 
-    color:#6b7280;
+    line-height: 1.5;
 }
 
-.register-link a{
-
-    color:#2563eb;
-
-    text-decoration:none;
-
-    font-weight:600;
-}
-
-.register-link a:hover{
-
-    text-decoration:underline;
-}
 
 /* ==========================
-   Tablet
+   FORM VALIDATION
 ========================== */
 
-@media(max-width:992px){
+/*
+   Apply .input-box.error from JSX when
+   an input has an error.
+*/
 
-.auth-container{
+.input-box.error {
+    border-color: #b91c1c;
 
-    grid-template-columns:1fr;
-
-    gap:60px;
-
-    padding:30px;
+    background: #fffafa;
 }
 
-.left-panel{
 
-    align-items:center;
+/* Error message */
 
-    text-align:center;
+.auth-error {
+    margin-top: 8px;
+
+    color: #b91c1c;
+
+    font-size: 14px;
+
+    line-height: 1.5;
 }
 
-.description{
-
-    max-width:600px;
-}
-
-.login-image{
-
-    max-width:260px;
-}
-
-.features{
-
-    align-items:flex-start;
-}
-
-}
 
 /* ==========================
-   Mobile
+   SUCCESS / STATUS MESSAGE
 ========================== */
 
-@media(max-width:600px){
+.auth-success {
+    margin-bottom: 20px;
 
-.auth-container{
+    padding: 12px 15px;
 
-    padding:20px;
+    border: 1px solid #15803d;
+
+    border-radius: 8px;
+
+    background: #f0fdf4;
+
+    color: #166534;
+
+    font-size: 14px;
+
+    line-height: 1.5;
 }
 
-.login-card{
 
-    padding:28px;
+/* ==========================
+   OTP INPUT
+========================== */
+
+.input-box input[name="otp"],
+.input-box input[autocomplete="one-time-code"] {
+    letter-spacing: 0.15em;
+
+    font-weight: 600;
+
+    text-align: left;
 }
 
-.logo{
 
-    font-size:24px;
+/* ==========================
+   GENERAL KEYBOARD FOCUS
+========================== */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 3px solid #1d4ed8;
+
+    outline-offset: 3px;
 }
 
-.left-panel h1{
 
-    font-size:32px;
+/*
+   Input itself is inside .input-box.
+   Remove duplicate outline because
+   the parent provides the visible focus.
+*/
+
+.input-box input:focus-visible,
+.input-box select:focus-visible {
+    outline: none;
 }
 
-.login-image{
 
-    max-width:220px;
+/* ==========================
+   TABLET
+========================== */
+
+@media (max-width: 992px) {
+
+    .auth-container {
+        grid-template-columns: 1fr;
+
+        gap: 60px;
+
+        padding: 30px;
+    }
+
+    .left-panel {
+        align-items: center;
+
+        text-align: center;
+    }
+
+    .description {
+        max-width: 600px;
+    }
+
+    .login-image {
+        max-width: 260px;
+    }
+
+    .features {
+        align-items: flex-start;
+
+        text-align: left;
+    }
 }
 
-.description{
 
-    font-size:15px;
+/* ==========================
+   MOBILE
+========================== */
+
+@media (max-width: 600px) {
+
+    .auth-container {
+        padding: 20px 15px;
+
+        gap: 35px;
+    }
+
+    .login-card {
+        padding: 28px 22px;
+    }
+
+    .logo {
+        font-size: 24px;
+
+        margin-bottom: 20px;
+    }
+
+    .left-panel h1 {
+        font-size: 32px;
+    }
+
+    .login-image {
+        max-width: 220px;
+    }
+
+    .description {
+        font-size: 15px;
+    }
+
+    .login-card h2 {
+        font-size: 28px;
+    }
+
+    .input-box {
+        min-height: 52px;
+    }
+
+    .login-btn {
+        min-height: 52px;
+    }
 }
 
-.login-card h2{
 
-    font-size:28px;
+/* ==========================
+   SMALL MOBILE
+========================== */
+
+@media (max-width: 400px) {
+
+    .auth-container {
+        padding: 15px 12px;
+    }
+
+    .login-card {
+        padding: 24px 18px;
+
+        border-radius: 12px;
+    }
+
+    .login-card h2 {
+        font-size: 25px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    .feature {
+        font-size: 14px;
+    }
 }
 
+
+/* ============================================================
+   REDUCED MOTION
+   WCAG 2.1 - 2.3.3
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+
+        animation-iteration-count: 1 !important;
+
+        transition-duration: 0.01ms !important;
+
+        scroll-behavior: auto !important;
+    }
 }

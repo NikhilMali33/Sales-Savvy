@@ -13,10 +13,27 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
+    min-height: 44px;
+    padding: 8px 4px;
+    box-sizing: border-box;
+
     color: #111827;
     text-decoration: none;
     font-weight: 600;
     margin-bottom: 25px;
+    border-radius: 6px;
+}
+
+.back-orders-link:hover {
+    text-decoration: underline;
+}
+
+.back-orders-link:focus-visible,
+.back-orders-btn:focus-visible,
+.cancel-order-btn:focus-visible,
+.retry-payment-btn:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
 }
 
 .order-details-header {
@@ -34,7 +51,7 @@
 }
 
 .order-details-header p {
-    color: #666;
+    color: #4b5563;
     margin-top: 10px;
 }
 
@@ -42,9 +59,11 @@
     background: white;
     border-radius: 12px;
     padding: 25px;
+
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     margin-bottom: 25px;
 }
@@ -56,7 +75,7 @@
 }
 
 .summary-item span {
-    color: #777;
+    color: #4b5563;
     font-size: 13px;
 }
 
@@ -65,24 +84,25 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    font-weight: 600;
 }
 
 .detail-order-status.confirmed,
 .detail-order-status.delivered,
 .detail-payment-status.success {
-    color: #198754;
+    color: #166534;
 }
 
 .detail-order-status.placed,
 .detail-order-status.processing,
 .detail-order-status.shipped,
 .detail-payment-status.pending {
-    color: #d39e00;
+    color: #92400e;
 }
 
 .detail-order-status.cancelled,
 .detail-payment-status.failed {
-    color: #dc3545;
+    color: #b91c1c;
 }
 
 .detail-total {
@@ -94,6 +114,7 @@
     background: white;
     border-radius: 12px;
     padding: 25px;
+
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     margin-bottom: 25px;
 }
@@ -118,10 +139,13 @@
 .order-item {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr;
+
     align-items: center;
     gap: 20px;
+
     padding: 20px 0;
-    border-bottom: 1px solid #eee;
+
+    border-bottom: 1px solid #d1d5db;
 }
 
 .item-info h3 {
@@ -130,7 +154,7 @@
 
 .item-info p {
     margin: 0;
-    color: #777;
+    color: #4b5563;
     font-size: 13px;
 }
 
@@ -145,7 +169,7 @@
 .item-quantity span,
 .item-price span,
 .item-total span {
-    color: #777;
+    color: #4b5563;
     font-size: 13px;
 }
 
@@ -153,7 +177,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     padding-top: 22px;
+
     font-size: 18px;
 }
 
@@ -165,39 +191,56 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 20px;
 }
 
 .payment-info-content p {
     margin: 0;
-    color: #666;
+    color: #4b5563;
 }
 
 .order-details-loading,
 .order-details-error {
     min-height: 60vh;
+
     display: flex;
     flex-direction: column;
+
     justify-content: center;
     align-items: center;
+
     text-align: center;
 }
 
 .order-details-error p {
-    color: #666;
+    color: #4b5563;
 }
 
 .back-orders-btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 44px;
+    box-sizing: border-box;
+
     margin-top: 15px;
     padding: 11px 18px;
+
     border-radius: 8px;
+
     background: #111827;
     color: white;
+
     text-decoration: none;
+    font-weight: 600;
+}
+
+.back-orders-btn:hover {
+    background: #1f2937;
 }
 
 @media (max-width: 800px) {
-
     .order-summary-card {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -208,31 +251,44 @@
 }
 
 @media (max-width: 500px) {
+    .order-details-page {
+        padding: 25px 16px 45px;
+    }
 
     .order-summary-card {
         grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .order-items-card,
+    .payment-info-card {
+        padding: 20px;
     }
 
     .order-item {
         grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .payment-info-content {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
-
-
-/* ============================================================
-   CANCEL ORDER
-   ============================================================ */
 
 .cancel-order-card {
     background: white;
     border-radius: 12px;
+
     padding: 22px 25px;
     margin-bottom: 25px;
+
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     gap: 20px;
 }
 
@@ -243,7 +299,7 @@
 
 .cancel-order-card p {
     margin: 0;
-    color: #777;
+    color: #4b5563;
     font-size: 14px;
 }
 
@@ -251,6 +307,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
+    min-height: 44px;
+
     gap: 8px;
 
     padding: 11px 18px;
@@ -258,9 +317,10 @@
     border: none;
     border-radius: 8px;
 
-    background: #dc3545;
+    background: #b91c1c;
     color: white;
 
+    font-family: inherit;
     font-size: 14px;
     font-weight: 600;
 
@@ -268,7 +328,7 @@
 }
 
 .cancel-order-btn:hover {
-    background: #bb2d3b;
+    background: #991b1b;
 }
 
 .cancel-order-btn:disabled {
@@ -276,14 +336,16 @@
     cursor: not-allowed;
 }
 
-
-/* ERROR */
+.cancel-order-btn:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
 
 .order-action-error {
-    background: #fff3f3;
-    color: #dc3545;
+    background: #fff1f2;
+    color: #991b1b;
 
-    border: 1px solid #f5c2c7;
+    border: 1px solid #fecdd3;
     border-radius: 8px;
 
     padding: 12px 15px;
@@ -292,9 +354,7 @@
     font-size: 14px;
 }
 
-
 @media (max-width: 600px) {
-
     .cancel-order-card {
         flex-direction: column;
         align-items: stretch;
@@ -305,21 +365,19 @@
     }
 }
 
-
-/* ============================================================
-   RETRY PAYMENT
-   ============================================================ */
-
 .retry-payment-card {
     background: white;
     border-radius: 12px;
+
     padding: 22px 25px;
     margin-bottom: 25px;
+
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     gap: 20px;
 }
 
@@ -330,7 +388,7 @@
 
 .retry-payment-card p {
     margin: 0;
-    color: #777;
+    color: #4b5563;
     font-size: 14px;
 }
 
@@ -338,6 +396,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
+    min-height: 44px;
+
     gap: 8px;
 
     padding: 11px 18px;
@@ -345,9 +406,10 @@
     border: none;
     border-radius: 8px;
 
-    background: #3399cc;
+    background: #166987;
     color: white;
 
+    font-family: inherit;
     font-size: 14px;
     font-weight: 600;
 
@@ -355,12 +417,17 @@
 }
 
 .retry-payment-btn:hover {
-    opacity: 0.9;
+    background: #125873;
 }
 
 .retry-payment-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.retry-payment-btn:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
 }
 
 .retry-spinner {
@@ -378,7 +445,6 @@
 }
 
 @media (max-width: 600px) {
-
     .retry-payment-card {
         flex-direction: column;
         align-items: stretch;
@@ -386,5 +452,17 @@
 
     .retry-payment-btn {
         width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .retry-spinner {
+        animation: none;
+    }
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
     }
 }

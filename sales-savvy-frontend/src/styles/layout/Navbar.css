@@ -1,8 +1,12 @@
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+
 .navbar {
 
     background: #0f172a;
 
-    color: white;
+    color: #ffffff;
 
     padding: 18px 40px;
 
@@ -15,9 +19,19 @@
 }
 
 
+/* ============================================================
+   LOGO
+   ============================================================ */
+
 .navbar-logo {
 
-    color: white;
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    color: #ffffff;
 
     text-decoration: none;
 
@@ -28,9 +42,13 @@
 }
 
 
+/* ============================================================
+   CART
+   ============================================================ */
+
 .cart-link {
 
-    color: white;
+    color: #ffffff;
 
     text-decoration: none;
 
@@ -58,6 +76,11 @@
 }
 
 
+/*
+   Dark red provides better contrast with white text
+   than the previous bright red badge.
+*/
+
 .cart-badge {
 
     position: absolute;
@@ -66,9 +89,9 @@
 
     right: -9px;
 
-    background: #ef4444;
+    background: #b91c1c;
 
-    color: white;
+    color: #ffffff;
 
     width: 18px;
 
@@ -88,33 +111,51 @@
 
 }
 
+
+/* ============================================================
+   NAVBAR ACTIONS
+   ============================================================ */
+
 .navbar-actions {
+
     display: flex;
+
     align-items: center;
+
     gap: 28px;
+
 }
+
 
 .orders-link {
+
     display: flex;
+
     align-items: center;
+
     gap: 7px;
-    color: white;
+
+    color: #ffffff;
+
     text-decoration: none;
+
     font-weight: 600;
+
 }
 
-.orders-link:hover {
-    opacity: 0.85;
-}
 
 /* ============================================================
    NAVBAR RIGHT SIDE
    ============================================================ */
 
 .navbar-right {
+
     display: flex;
+
     align-items: center;
+
     gap: 28px;
+
 }
 
 
@@ -123,25 +164,45 @@
    ============================================================ */
 
 .navbar-link {
+
     display: flex;
+
     align-items: center;
+
     gap: 8px;
 
-    color: white;
+    color: #ffffff;
+
     text-decoration: none;
 
     font-size: 16px;
+
     font-weight: 600;
 
-    transition: opacity 0.2s ease;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+
+    border-radius: 6px;
+
+    padding: 8px 6px;
+
 }
+
 
 .navbar-link:hover {
-    opacity: 0.8;
+
+    background-color: #1e293b;
+
 }
 
+
 .navbar-link-icon {
+
     font-size: 22px;
+
+    line-height: 1;
+
 }
 
 
@@ -150,31 +211,45 @@
    ============================================================ */
 
 .profile-container {
+
     position: relative;
+
 }
 
 
 .profile-button {
+
     display: flex;
+
     align-items: center;
+
     gap: 8px;
 
-    border: none;
+    border: 2px solid transparent;
+
     background: transparent;
 
-    color: white;
+    color: #ffffff;
 
     font-size: 16px;
+
     font-weight: 600;
 
     cursor: pointer;
 
-    padding: 6px 4px;
+    padding: 8px 6px;
+
+    border-radius: 6px;
+
+    font-family: inherit;
+
 }
 
 
 .profile-button:hover {
-    opacity: 0.8;
+
+    background-color: #1e293b;
+
 }
 
 
@@ -183,14 +258,18 @@
    ============================================================ */
 
 .profile-dropdown {
+
     position: absolute;
 
     top: calc(100% + 12px);
+
     right: 0;
 
     width: 190px;
 
-    background: white;
+    background: #ffffff;
+
+    border: 1px solid #d1d5db;
 
     border-radius: 10px;
 
@@ -200,6 +279,7 @@
     padding: 8px;
 
     z-index: 1000;
+
 }
 
 
@@ -208,16 +288,19 @@
    ============================================================ */
 
 .profile-dropdown-item {
+
     width: 100%;
 
     display: flex;
+
     align-items: center;
 
     gap: 12px;
 
     padding: 12px 14px;
 
-    border: none;
+    border: 2px solid transparent;
+
     border-radius: 7px;
 
     background: transparent;
@@ -226,17 +309,23 @@
 
     text-decoration: none;
 
+    font-family: inherit;
+
     font-size: 15px;
+
     font-weight: 600;
 
     cursor: pointer;
 
     box-sizing: border-box;
+
 }
 
 
 .profile-dropdown-item:hover {
+
     background: #f1f4f8;
+
 }
 
 
@@ -245,10 +334,103 @@
    ============================================================ */
 
 .logout-item {
-    color: #dc2626;
+
+    color: #b91c1c;
+
 }
 
 
 .logout-item:hover {
+
     background: #fff1f2;
+
+}
+
+
+/* ============================================================
+   KEYBOARD FOCUS
+   WCAG 2.1 - Keyboard Accessibility
+   ============================================================ */
+
+.navbar a:focus-visible,
+.profile-button:focus-visible,
+.profile-dropdown-item:focus-visible {
+
+    outline: 3px solid #93c5fd;
+
+    outline-offset: 3px;
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    .navbar {
+
+        padding: 16px 20px;
+
+    }
+
+    .navbar-right {
+
+        gap: 16px;
+
+    }
+
+    .navbar-link span:last-child,
+    .profile-button span,
+    .cart-link > span {
+
+        /*
+           Keep important navigation text visible.
+           Do not hide it for accessibility.
+        */
+
+        display: inline;
+
+    }
+
+}
+
+
+@media (max-width: 520px) {
+
+    .navbar {
+
+        padding: 14px 16px;
+
+        gap: 12px;
+
+    }
+
+    .navbar-logo {
+
+        font-size: 20px;
+
+    }
+
+    .navbar-right {
+
+        gap: 8px;
+
+    }
+
+    .navbar-link,
+    .profile-button,
+    .cart-link {
+
+        font-size: 14px;
+
+    }
+
+    .profile-dropdown {
+
+        right: -8px;
+
+    }
+
 }

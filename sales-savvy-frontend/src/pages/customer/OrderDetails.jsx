@@ -24,7 +24,6 @@ import {
 
 import "../../styles/customer/OrderDetails.css";
 
-
 const OrderDetails = () => {
 
     const { orderId } = useParams();
@@ -33,16 +32,8 @@ const OrderDetails = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const [cancelling, setCancelling] =
-        useState(false);
-
-    const [retryingPayment, setRetryingPayment] =
-        useState(false);
-
-
-    // ============================================================
-    // LOAD ORDER
-    // ============================================================
+    const [cancelling, setCancelling] = useState(false);
+    const [retryingPayment, setRetryingPayment] = useState(false);
 
     useEffect(() => {
 
@@ -53,8 +44,7 @@ const OrderDetails = () => {
                 setLoading(true);
                 setError("");
 
-                const response =
-                    await getMyOrder(orderId);
+                const response = await getMyOrder(orderId);
 
                 setOrder(response.data);
 
@@ -81,10 +71,6 @@ const OrderDetails = () => {
     }, [orderId]);
 
 
-    // ============================================================
-    // RETRY PAYMENT
-    // ============================================================
-
     const handleRetryPayment = async () => {
 
         try {
@@ -92,21 +78,11 @@ const OrderDetails = () => {
             setRetryingPayment(true);
             setError("");
 
-
-            // ----------------------------------------------------
-            // STEP 1: Create / reuse Razorpay order
-            // ----------------------------------------------------
-
             const paymentResponse =
                 await createPaymentOrder(orderId);
 
             const paymentData =
                 paymentResponse.data;
-
-
-            // ----------------------------------------------------
-            // STEP 2: Check Razorpay script
-            // ----------------------------------------------------
 
             if (!window.Razorpay) {
 
@@ -118,11 +94,6 @@ const OrderDetails = () => {
 
                 return;
             }
-
-
-            // ----------------------------------------------------
-            // STEP 3: Razorpay options
-            // ----------------------------------------------------
 
             const options = {
 
@@ -140,23 +111,13 @@ const OrderDetails = () => {
                 order_id:
                     paymentData.razorpayOrderId,
 
-
-                // ------------------------------------------------
-                // PAYMENT SUCCESS
-                // ------------------------------------------------
-
                 handler: async function (response) {
 
                     try {
 
-                        // ----------------------------------------
-                        // Verify payment with backend
-                        // ----------------------------------------
-
                         await verifyPayment({
 
-                            orderId:
-                                orderId,
+                            orderId: orderId,
 
                             razorpayOrderId:
                                 response.razorpay_order_id,
@@ -168,11 +129,6 @@ const OrderDetails = () => {
                                 response.razorpay_signature
                         });
 
-
-                        // ----------------------------------------
-                        // Payment successful
-                        // ----------------------------------------
-
                         const updatedOrderResponse =
                             await getMyOrder(orderId);
 
@@ -180,12 +136,9 @@ const OrderDetails = () => {
                             updatedOrderResponse.data
                         );
 
-
-                        // Update cart count in Navbar
                         window.dispatchEvent(
                             new Event("cartUpdated")
                         );
-
 
                         alert(
                             "Payment successful! Your order has been confirmed."
@@ -210,11 +163,6 @@ const OrderDetails = () => {
                     }
                 },
 
-
-                // ------------------------------------------------
-                // PAYMENT MODAL CLOSED
-                // ------------------------------------------------
-
                 modal: {
 
                     ondismiss: function () {
@@ -227,38 +175,18 @@ const OrderDetails = () => {
                     }
                 },
 
-
-                // ------------------------------------------------
-                // PREFILL
-                // ------------------------------------------------
-
                 prefill: {
                     name: "",
                     email: ""
                 },
-
-
-                // ------------------------------------------------
-                // THEME
-                // ------------------------------------------------
 
                 theme: {
                     color: "#3399cc"
                 }
             };
 
-
-            // ----------------------------------------------------
-            // STEP 4: Open Razorpay
-            // ----------------------------------------------------
-
             const razorpay =
                 new window.Razorpay(options);
-
-
-            // ----------------------------------------------------
-            // Handle Razorpay payment failure
-            // ----------------------------------------------------
 
             razorpay.on(
                 "payment.failed",
@@ -277,7 +205,6 @@ const OrderDetails = () => {
                     );
                 }
             );
-
 
             razorpay.open();
 
@@ -298,10 +225,6 @@ const OrderDetails = () => {
         }
     };
 
-
-    // ============================================================
-    // CANCEL ORDER
-    // ============================================================
 
     const handleCancelOrder = async () => {
 
@@ -344,31 +267,28 @@ const OrderDetails = () => {
     };
 
 
-    // ============================================================
-    // LOADING
-    // ============================================================
-
     if (loading) {
 
         return (
             <>
                 <Navbar />
 
-                <div className="order-details-page">
-
-                    <div className="order-details-loading">
+                <main
+                    className="order-details-page"
+                    aria-busy="true"
+                >
+                    <div
+                        className="order-details-loading"
+                        role="status"
+                        aria-live="polite"
+                    >
                         Loading order details...
                     </div>
-
-                </div>
+                </main>
             </>
         );
     }
 
-
-    // ============================================================
-    // ERROR
-    // ============================================================
 
     if (error && !order) {
 
@@ -376,15 +296,21 @@ const OrderDetails = () => {
             <>
                 <Navbar />
 
-                <div className="order-details-page">
+                <main className="order-details-page">
 
-                    <div className="order-details-error">
+                    <div
+                        className="order-details-error"
+                        role="alert"
+                    >
 
-                        <XCircle size={55} />
+                        <XCircle
+                            size={55}
+                            aria-hidden="true"
+                        />
 
-                        <h2>
+                        <h1>
                             Order Not Found
-                        </h2>
+                        </h1>
 
                         <p>
                             {error}
@@ -399,7 +325,7 @@ const OrderDetails = () => {
 
                     </div>
 
-                </div>
+                </main>
             </>
         );
     }
@@ -410,85 +336,80 @@ const OrderDetails = () => {
     }
 
 
-    // ============================================================
-    // PAYMENT ICON
-    // ============================================================
-
     const getPaymentIcon = () => {
 
         if (order.paymentStatus === "SUCCESS") {
 
             return (
-                <CheckCircle size={22} />
+                <CheckCircle
+                    size={22}
+                    aria-hidden="true"
+                />
             );
         }
 
         if (order.paymentStatus === "FAILED") {
 
             return (
-                <XCircle size={22} />
+                <XCircle
+                    size={22}
+                    aria-hidden="true"
+                />
             );
         }
 
         return (
-            <Clock size={22} />
+            <Clock
+                size={22}
+                aria-hidden="true"
+            />
         );
     };
 
-
-    // ============================================================
-    // CAN CANCEL?
-    // ============================================================
 
     const canCancel =
         order.status === "PLACED" &&
         order.paymentStatus !== "SUCCESS";
 
 
-    // ============================================================
-    // CAN RETRY PAYMENT?
-    // ============================================================
-
     const canRetryPayment =
         order.status === "PLACED" &&
         order.paymentStatus !== "SUCCESS";
 
 
-    // ============================================================
-    // RENDER
-    // ============================================================
-
     return (
         <>
             <Navbar />
 
-            <div className="order-details-page">
+            <main className="order-details-page">
 
                 <div className="order-details-container">
-
-                    {/* BACK BUTTON */}
 
                     <Link
                         to="/orders"
                         className="back-orders-link"
                     >
+                        <ArrowLeft
+                            size={18}
+                            aria-hidden="true"
+                        />
 
-                        <ArrowLeft size={18} />
-
-                        Back to My Orders
-
+                        <span>
+                            Back to My Orders
+                        </span>
                     </Link>
 
 
-                    {/* HEADER */}
-
-                    <div className="order-details-header">
+                    <header className="order-details-header">
 
                         <div>
 
                             <div className="order-title-row">
 
-                                <Package size={32} />
+                                <Package
+                                    size={32}
+                                    aria-hidden="true"
+                                />
 
                                 <h1>
                                     Order Details
@@ -505,23 +426,33 @@ const OrderDetails = () => {
 
                         </div>
 
-                    </div>
+                    </header>
 
-
-                    {/* ERROR MESSAGE */}
 
                     {error && (
 
-                        <div className="order-action-error">
+                        <div
+                            className="order-action-error"
+                            role="alert"
+                            aria-live="assertive"
+                        >
                             {error}
                         </div>
 
                     )}
 
 
-                    {/* ORDER SUMMARY */}
+                    <section
+                        className="order-summary-card"
+                        aria-labelledby="order-summary-heading"
+                    >
 
-                    <div className="order-summary-card">
+                        <h2
+                            id="order-summary-heading"
+                            className="visually-hidden"
+                        >
+                            Order Summary
+                        </h2>
 
                         <div className="summary-item">
 
@@ -575,11 +506,11 @@ const OrderDetails = () => {
                                     order.paymentStatus
                                 ).toLowerCase()}`}
                             >
-
                                 {getPaymentIcon()}
 
-                                {order.paymentStatus}
-
+                                <span>
+                                    {order.paymentStatus}
+                                </span>
                             </strong>
 
                         </div>
@@ -592,29 +523,31 @@ const OrderDetails = () => {
                             </span>
 
                             <strong className="detail-total">
-
                                 ₹{Number(
                                     order.totalAmount
                                 ).toLocaleString(
                                     "en-IN"
                                 )}
-
                             </strong>
 
                         </div>
 
-                    </div>
+                    </section>
 
 
-                    {/* PRODUCTS */}
-
-                    <div className="order-items-card">
+                    <section
+                        className="order-items-card"
+                        aria-labelledby="order-items-heading"
+                    >
 
                         <div className="section-title">
 
-                            <Package size={22} />
+                            <Package
+                                size={22}
+                                aria-hidden="true"
+                            />
 
-                            <h2>
+                            <h2 id="order-items-heading">
                                 Items in this Order
                             </h2>
 
@@ -625,7 +558,7 @@ const OrderDetails = () => {
 
                             {order.items?.map((item) => (
 
-                                <div
+                                <article
                                     className="order-item"
                                     key={item.id}
                                 >
@@ -664,13 +597,11 @@ const OrderDetails = () => {
                                         </span>
 
                                         <strong>
-
                                             ₹{Number(
                                                 item.pricePerUnit
                                             ).toLocaleString(
                                                 "en-IN"
                                             )}
-
                                         </strong>
 
                                     </div>
@@ -683,25 +614,21 @@ const OrderDetails = () => {
                                         </span>
 
                                         <strong>
-
                                             ₹{Number(
                                                 item.totalPrice
                                             ).toLocaleString(
                                                 "en-IN"
                                             )}
-
                                         </strong>
 
                                     </div>
 
-                                </div>
+                                </article>
 
                             ))}
 
                         </div>
 
-
-                        {/* TOTAL */}
 
                         <div className="order-grand-total">
 
@@ -710,29 +637,31 @@ const OrderDetails = () => {
                             </span>
 
                             <strong>
-
                                 ₹{Number(
                                     order.totalAmount
                                 ).toLocaleString(
                                     "en-IN"
                                 )}
-
                             </strong>
 
                         </div>
 
-                    </div>
+                    </section>
 
 
-                    {/* PAYMENT INFORMATION */}
-
-                    <div className="payment-info-card">
+                    <section
+                        className="payment-info-card"
+                        aria-labelledby="payment-information-heading"
+                    >
 
                         <div className="section-title">
 
-                            <CreditCard size={22} />
+                            <CreditCard
+                                size={22}
+                                aria-hidden="true"
+                            />
 
-                            <h2>
+                            <h2 id="payment-information-heading">
                                 Payment Information
                             </h2>
 
@@ -754,20 +683,21 @@ const OrderDetails = () => {
 
                         </div>
 
-                    </div>
+                    </section>
 
-
-                    {/* RETRY PAYMENT */}
 
                     {canRetryPayment && (
 
-                        <div className="retry-payment-card">
+                        <section
+                            className="retry-payment-card"
+                            aria-labelledby="retry-payment-heading"
+                        >
 
                             <div>
 
-                                <h3>
+                                <h2 id="retry-payment-heading">
                                     Payment is pending
-                                </h3>
+                                </h2>
 
                                 <p>
                                     Your order has been created,
@@ -783,10 +713,12 @@ const OrderDetails = () => {
                                 className="retry-payment-btn"
                                 onClick={handleRetryPayment}
                                 disabled={retryingPayment}
+                                aria-busy={retryingPayment}
                             >
 
                                 <RefreshCw
                                     size={18}
+                                    aria-hidden="true"
                                     className={
                                         retryingPayment
                                             ? "retry-spinner"
@@ -794,28 +726,31 @@ const OrderDetails = () => {
                                     }
                                 />
 
-                                {retryingPayment
-                                    ? "Opening Payment..."
-                                    : "Retry Payment"}
+                                <span>
+                                    {retryingPayment
+                                        ? "Opening Payment..."
+                                        : "Retry Payment"}
+                                </span>
 
                             </button>
 
-                        </div>
+                        </section>
 
                     )}
 
 
-                    {/* CANCEL ORDER */}
-
                     {canCancel && (
 
-                        <div className="cancel-order-card">
+                        <section
+                            className="cancel-order-card"
+                            aria-labelledby="cancel-order-heading"
+                        >
 
                             <div>
 
-                                <h3>
+                                <h2 id="cancel-order-heading">
                                     Cancel this order?
-                                </h3>
+                                </h2>
 
                                 <p>
                                     You can cancel this order
@@ -825,6 +760,7 @@ const OrderDetails = () => {
 
                             </div>
 
+
                             <button
                                 type="button"
                                 className="cancel-order-btn"
@@ -833,26 +769,31 @@ const OrderDetails = () => {
                                     cancelling ||
                                     retryingPayment
                                 }
+                                aria-busy={cancelling}
                             >
 
-                                <Ban size={18} />
+                                <Ban
+                                    size={18}
+                                    aria-hidden="true"
+                                />
 
-                                {cancelling
-                                    ? "Cancelling..."
-                                    : "Cancel Order"}
+                                <span>
+                                    {cancelling
+                                        ? "Cancelling..."
+                                        : "Cancel Order"}
+                                </span>
 
                             </button>
 
-                        </div>
+                        </section>
 
                     )}
 
                 </div>
 
-            </div>
+            </main>
         </>
     );
 };
-
 
 export default OrderDetails;

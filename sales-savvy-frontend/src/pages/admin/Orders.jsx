@@ -12,11 +12,11 @@ function Orders() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
 
-    // ============================================================
-    // LOAD ORDERS
-    // ============================================================
+    const ordersPerPage = 10;
 
+    // Load orders
     useEffect(() => {
 
         const fetchOrders = async () => {
@@ -45,6 +45,7 @@ function Orders() {
             } finally {
 
                 setLoading(false);
+
             }
         };
 
@@ -52,11 +53,7 @@ function Orders() {
 
     }, []);
 
-
-    // ============================================================
-    // FORMAT DATE
-    // ============================================================
-
+    // Format date
     const formatDate = (date) => {
 
         if (!date) {
@@ -73,97 +70,133 @@ function Orders() {
         );
     };
 
+    // Pagination
+    const totalPages = Math.ceil(
+        orders.length / ordersPerPage
+    );
 
-    // ============================================================
-    // LOADING
-    // ============================================================
+    const startIndex =
+        (currentPage - 1) * ordersPerPage;
 
+    const currentOrders = orders.slice(
+        startIndex,
+        startIndex + ordersPerPage
+    );
+
+    const handlePageChange = (page) => {
+
+        setCurrentPage(page);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    };
+
+    // Loading state
     if (loading) {
 
         return (
             <>
                 <AdminNavbar />
 
-                <div className="admin-orders-page">
+                <main
+                    className="admin-orders-page"
+                    aria-labelledby="orders-loading-heading"
+                >
+                    <div
+                        className="admin-orders-loading"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <h1 id="orders-loading-heading">
+                            Loading orders
+                        </h1>
 
-                    <div className="admin-orders-loading">
-                        Loading orders...
+                        <p>
+                            Please wait while the orders are loaded.
+                        </p>
                     </div>
-
-                </div>
+                </main>
             </>
         );
     }
 
-
-    // ============================================================
-    // ERROR
-    // ============================================================
-
+    // Error state
     if (error) {
 
         return (
             <>
                 <AdminNavbar />
 
-                <div className="admin-orders-page">
+                <main
+                    className="admin-orders-page"
+                    aria-labelledby="orders-error-heading"
+                >
+                    <div
+                        className="admin-orders-error"
+                        role="alert"
+                    >
+                        <h1 id="orders-error-heading">
+                            Unable to load orders
+                        </h1>
 
-                    <div className="admin-orders-error">
-                        {error}
+                        <p>
+                            {error}
+                        </p>
                     </div>
-
-                </div>
+                </main>
             </>
         );
     }
-
-
-    // ============================================================
-    // ORDERS PAGE
-    // ============================================================
 
     return (
         <>
             <AdminNavbar />
 
-            <div className="admin-orders-page">
+            <main
+                className="admin-orders-page"
+                aria-labelledby="orders-page-title"
+            >
 
                 <div className="admin-orders-container">
 
-                    {/* ====================================================
-                        HEADER
-                    ==================================================== */}
-
-                    <div className="admin-orders-header">
+                    {/* Header */}
+                    <header className="admin-orders-header">
 
                         <div>
-
-                            <h1>
+                            <h1 id="orders-page-title">
                                 Orders
                             </h1>
 
                             <p>
                                 Manage customer orders
                             </p>
-
                         </div>
 
-                        <Package size={38} />
+                        <Package
+                            size={38}
+                            aria-hidden="true"
+                            focusable="false"
+                        />
 
-                    </div>
+                    </header>
 
-
-                    {/* ====================================================
-                        EMPTY STATE
-                    ==================================================== */}
-
+                    {/* Empty state */}
                     {orders.length === 0 ? (
 
-                        <div className="admin-orders-empty">
+                        <section
+                            className="admin-orders-empty"
+                            aria-labelledby="no-orders-heading"
+                        >
 
-                            <Package size={60} />
+                            <Package
+                                size={60}
+                                aria-hidden="true"
+                                focusable="false"
+                            />
 
-                            <h2>
+                            <h2 id="no-orders-heading">
                                 No orders found
                             </h2>
 
@@ -171,180 +204,279 @@ function Orders() {
                                 Customer orders will appear here.
                             </p>
 
-                        </div>
+                        </section>
 
                     ) : (
 
-                        /* ==================================================
-                           ORDER LIST
-                        ================================================== */
+                        <>
+                            {/* Order list */}
+                            <section
+                                className="admin-orders-list"
+                                aria-label="Customer orders"
+                                aria-live="polite"
+                            >
 
-                        <div className="admin-orders-list">
+                                {currentOrders.map((order) => (
 
-                            {orders.map((order) => (
+                                    <article
+                                        className="admin-order-card"
+                                        key={order.orderId}
+                                        aria-labelledby={`order-${order.orderId}`}
+                                    >
 
-                                <div
-                                    className="admin-order-card"
-                                    key={order.orderId}
-                                >
+                                        {/* Order header */}
+                                        <header className="admin-order-header">
 
-                                    {/* ==================================================
-                                        ORDER HEADER
-                                    ================================================== */}
+                                            <div>
+                                                <span>
+                                                    Order ID
+                                                </span>
 
-                                    <div className="admin-order-header">
+                                                <strong
+                                                    id={`order-${order.orderId}`}
+                                                >
+                                                    {order.orderId}
+                                                </strong>
+                                            </div>
 
-                                        <div>
+                                            <div>
+                                                <span>
+                                                    Order Date
+                                                </span>
 
-                                            <span>
-                                                Order ID
-                                            </span>
+                                                <strong>
+                                                    {formatDate(
+                                                        order.createdAt
+                                                    )}
+                                                </strong>
+                                            </div>
 
-                                            <strong>
-                                                {order.orderId}
-                                            </strong>
+                                        </header>
 
-                                        </div>
-
-
-                                        <div>
-
-                                            <span>
-                                                Order Date
-                                            </span>
-
-                                            <strong>
-                                                {formatDate(
-                                                    order.createdAt
-                                                )}
-                                            </strong>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* ==================================================
-                                        ORDER CUSTOMER
-                                    ================================================== */}
-
-                                    <div className="admin-order-customer">
-
-                                        <div className="admin-customer-icon">
-
-                                            <User size={18} />
-
-                                        </div>
-
-
-                                        <div className="admin-customer-info">
-
-                                            <span>
-                                                Customer
-                                            </span>
-
-                                            <strong>
-                                                {order.username}
-                                            </strong>
-
-                                            <small>
-                                                {order.email}
-                                            </small>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* ==================================================
-                                        ORDER BODY
-                                    ================================================== */}
-
-                                    <div className="admin-order-body">
-
-                                        {/* TOTAL */}
-
-                                        <div className="admin-order-info">
-
-                                            <span>
-                                                Total Amount
-                                            </span>
-
-                                            <strong>
-                                                ₹{Number(
-                                                    order.totalAmount
-                                                ).toLocaleString(
-                                                    "en-IN"
-                                                )}
-                                            </strong>
-
-                                        </div>
-
-
-                                        {/* PAYMENT */}
-
-                                        <div className="admin-order-info">
-
-                                            <span>
-                                                Payment
-                                            </span>
-
-                                            <span
-                                                className={`payment-status ${String(
-                                                    order.paymentStatus
-                                                ).toLowerCase()}`}
-                                            >
-                                                {order.paymentStatus}
-                                            </span>
-
-                                        </div>
-
-
-                                        {/* ORDER STATUS */}
-
-                                        <div className="admin-order-info">
-
-                                            <span>
-                                                Status
-                                            </span>
-
-                                            <span
-                                                className={`order-status ${String(
-                                                    order.status
-                                                ).toLowerCase()}`}
-                                            >
-                                                {order.status}
-                                            </span>
-
-                                        </div>
-
-
-                                        {/* VIEW DETAILS */}
-
-                                        <Link
-                                            to={`/admin/orders/${order.orderId}`}
-                                            className="admin-view-order-btn"
+                                        {/* Customer */}
+                                        <section
+                                            className="admin-order-customer"
+                                            aria-label={`Customer ${order.username}`}
                                         >
 
-                                            <Eye size={18} />
+                                            <div
+                                                className="admin-customer-icon"
+                                                aria-hidden="true"
+                                            >
+                                                <User
+                                                    size={18}
+                                                    focusable="false"
+                                                />
+                                            </div>
 
-                                            View Details
+                                            <div className="admin-customer-info">
 
-                                        </Link>
+                                                <span>
+                                                    Customer
+                                                </span>
+
+                                                <strong>
+                                                    {order.username}
+                                                </strong>
+
+                                                <small>
+                                                    {order.email}
+                                                </small>
+
+                                            </div>
+
+                                        </section>
+
+                                        {/* Order information */}
+                                        <div className="admin-order-body">
+
+                                            {/* Total */}
+                                            <div className="admin-order-info">
+
+                                                <span>
+                                                    Total Amount
+                                                </span>
+
+                                                <strong>
+                                                    ₹{Number(
+                                                        order.totalAmount
+                                                    ).toLocaleString(
+                                                        "en-IN"
+                                                    )}
+                                                </strong>
+
+                                            </div>
+
+                                            {/* Payment */}
+                                            <div className="admin-order-info">
+
+                                                <span>
+                                                    Payment
+                                                </span>
+
+                                                <span
+                                                    className={`payment-status ${String(
+                                                        order.paymentStatus
+                                                    ).toLowerCase()}`}
+                                                >
+                                                    <span className="sr-only">
+                                                        Payment status:
+                                                    </span>
+
+                                                    {order.paymentStatus}
+                                                </span>
+
+                                            </div>
+
+                                            {/* Order status */}
+                                            <div className="admin-order-info">
+
+                                                <span>
+                                                    Status
+                                                </span>
+
+                                                <span
+                                                    className={`order-status ${String(
+                                                        order.status
+                                                    ).toLowerCase()}`}
+                                                >
+                                                    <span className="sr-only">
+                                                        Order status:
+                                                    </span>
+
+                                                    {order.status}
+                                                </span>
+
+                                            </div>
+
+                                            {/* View details */}
+                                            <Link
+                                                to={`/admin/orders/${order.orderId}`}
+                                                className="admin-view-order-btn"
+                                                aria-label={`View details for order ${order.orderId}`}
+                                            >
+
+                                                <Eye
+                                                    size={18}
+                                                    aria-hidden="true"
+                                                    focusable="false"
+                                                />
+
+                                                <span>
+                                                    View Details
+                                                </span>
+
+                                            </Link>
+
+                                        </div>
+
+                                    </article>
+
+                                ))}
+
+                            </section>
+
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+
+                                <nav
+                                    className="orders-pagination"
+                                    aria-label="Orders pagination"
+                                >
+
+                                    <button
+                                        type="button"
+                                        className="pagination-btn"
+                                        onClick={() =>
+                                            handlePageChange(
+                                                currentPage - 1
+                                            )
+                                        }
+                                        disabled={currentPage === 1}
+                                        aria-label="Go to previous page"
+                                    >
+                                        Previous
+                                    </button>
+
+                                    <div
+                                        className="pagination-pages"
+                                        aria-label="Page selection"
+                                    >
+
+                                        {Array.from(
+                                            { length: totalPages },
+                                            (_, index) => {
+                                                const page = index + 1;
+
+                                                return (
+                                                    <button
+                                                        key={page}
+                                                        type="button"
+                                                        className={`pagination-page ${
+                                                            currentPage === page
+                                                                ? "active"
+                                                                : ""
+                                                        }`}
+                                                        onClick={() =>
+                                                            handlePageChange(
+                                                                page
+                                                            )
+                                                        }
+                                                        aria-label={`Go to page ${page}`}
+                                                        aria-current={
+                                                            currentPage === page
+                                                                ? "page"
+                                                                : undefined
+                                                        }
+                                                    >
+                                                        {page}
+                                                    </button>
+                                                );
+                                            }
+                                        )}
 
                                     </div>
 
-                                </div>
+                                    <button
+                                        type="button"
+                                        className="pagination-btn"
+                                        onClick={() =>
+                                            handlePageChange(
+                                                currentPage + 1
+                                            )
+                                        }
+                                        disabled={
+                                            currentPage === totalPages
+                                        }
+                                        aria-label="Go to next page"
+                                    >
+                                        Next
+                                    </button>
 
-                            ))}
+                                </nav>
 
-                        </div>
+                            )}
+
+                            <p
+                                className="pagination-status"
+                                aria-live="polite"
+                            >
+                                Showing orders{" "}
+                                {startIndex + 1} to{" "}
+                                {Math.min(
+                                    startIndex + ordersPerPage,
+                                    orders.length
+                                )}{" "}
+                                of {orders.length}
+                            </p>
+
+                        </>
 
                     )}
 
                 </div>
 
-            </div>
+            </main>
         </>
     );
 }

@@ -31,6 +31,7 @@ function AddProduct() {
     const [loading, setLoading] = useState(false);
     const [categoryLoading, setCategoryLoading] = useState(true);
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     useEffect(() => {
         fetchCategories();
@@ -55,9 +56,7 @@ function AddProduct() {
         } finally {
 
             setCategoryLoading(false);
-
         }
-
     };
 
     const handleChange = (e) => {
@@ -69,6 +68,8 @@ function AddProduct() {
             [name]: value
         }));
 
+        setError("");
+        setSuccess("");
     };
 
     const handleImageChange = (e) => {
@@ -76,7 +77,7 @@ function AddProduct() {
         const selectedFiles = Array.from(e.target.files);
 
         setImages(selectedFiles);
-
+        setError("");
     };
 
     const handleSubmit = async (e) => {
@@ -84,6 +85,7 @@ function AddProduct() {
         e.preventDefault();
 
         setError("");
+        setSuccess("");
 
         // Basic validation
         if (!formData.productName.trim()) {
@@ -136,9 +138,11 @@ function AddProduct() {
 
             await addProduct(data);
 
-            alert("Product added successfully!");
+            setSuccess("Product added successfully.");
 
-            navigate("/admin/products");
+            setTimeout(() => {
+                navigate("/admin/products");
+            }, 1200);
 
         } catch (error) {
 
@@ -153,20 +157,17 @@ function AddProduct() {
         } finally {
 
             setLoading(false);
-
         }
-
     };
 
     return (
-
         <div className="add-product-container">
 
             <div className="add-product-header">
 
                 <div>
 
-                    <h2>Add Product</h2>
+                    <h1>Add Product</h1>
 
                     <p>
                         Add a new product to your store.
@@ -178,60 +179,81 @@ function AddProduct() {
                     type="button"
                     className="cancel-btn"
                     onClick={() => navigate("/admin/products")}
+                    disabled={loading}
                 >
                     Cancel
                 </button>
 
             </div>
 
-
             {error && (
-
-                <div className="form-error">
+                <div
+                    className="form-error"
+                    role="alert"
+                    aria-live="assertive"
+                    tabIndex="-1"
+                >
                     {error}
                 </div>
-
             )}
 
+            {success && (
+                <div
+                    className="form-success"
+                    role="status"
+                    aria-live="polite"
+                    tabIndex="-1"
+                >
+                    {success}
+                </div>
+            )}
 
             <form
                 className="add-product-form"
                 onSubmit={handleSubmit}
+                noValidate
             >
 
                 {/* Product Information */}
 
                 <div className="form-section">
 
-                    <h3>Product Information</h3>
-
+                    <h2>Product Information</h2>
 
                     <div className="form-grid">
 
                         <div className="form-group full-width">
 
-                            <label>
+                            <label htmlFor="productName">
                                 Product Name *
                             </label>
 
                             <input
+                                id="productName"
                                 type="text"
                                 name="productName"
                                 value={formData.productName}
                                 onChange={handleChange}
                                 placeholder="Enter product name"
+                                required
+                                aria-required="true"
+                                aria-invalid={
+                                    error && !formData.productName.trim()
+                                        ? "true"
+                                        : "false"
+                                }
                             />
 
                         </div>
 
-
                         <div className="form-group full-width">
 
-                            <label>
+                            <label htmlFor="description">
                                 Description
                             </label>
 
                             <textarea
+                                id="description"
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
@@ -241,14 +263,14 @@ function AddProduct() {
 
                         </div>
 
-
                         <div className="form-group">
 
-                            <label>
+                            <label htmlFor="brand">
                                 Brand
                             </label>
 
                             <input
+                                id="brand"
                                 type="text"
                                 name="brand"
                                 value={formData.brand}
@@ -258,19 +280,21 @@ function AddProduct() {
 
                         </div>
 
-
                         <div className="form-group">
 
-                            <label>
+                            <label htmlFor="sku">
                                 SKU *
                             </label>
 
                             <input
+                                id="sku"
                                 type="text"
                                 name="sku"
                                 value={formData.sku}
                                 onChange={handleChange}
                                 placeholder="Enter SKU"
+                                required
+                                aria-required="true"
                             />
 
                         </div>
@@ -279,23 +303,22 @@ function AddProduct() {
 
                 </div>
 
-
                 {/* Pricing & Inventory */}
 
                 <div className="form-section">
 
-                    <h3>Pricing & Inventory</h3>
-
+                    <h2>Pricing & Inventory</h2>
 
                     <div className="form-grid">
 
                         <div className="form-group">
 
-                            <label>
+                            <label htmlFor="price">
                                 Price *
                             </label>
 
                             <input
+                                id="price"
                                 type="number"
                                 name="price"
                                 value={formData.price}
@@ -303,18 +326,20 @@ function AddProduct() {
                                 placeholder="0.00"
                                 min="0"
                                 step="0.01"
+                                required
+                                aria-required="true"
                             />
 
                         </div>
 
-
                         <div className="form-group">
 
-                            <label>
+                            <label htmlFor="discountPrice">
                                 Discount Price
                             </label>
 
                             <input
+                                id="discountPrice"
                                 type="number"
                                 name="discountPrice"
                                 value={formData.discountPrice}
@@ -326,20 +351,22 @@ function AddProduct() {
 
                         </div>
 
-
                         <div className="form-group">
 
-                            <label>
+                            <label htmlFor="stock">
                                 Stock *
                             </label>
 
                             <input
+                                id="stock"
                                 type="number"
                                 name="stock"
                                 value={formData.stock}
                                 onChange={handleChange}
                                 placeholder="0"
                                 min="0"
+                                required
+                                aria-required="true"
                             />
 
                         </div>
@@ -348,27 +375,28 @@ function AddProduct() {
 
                 </div>
 
-
                 {/* Category & Status */}
 
                 <div className="form-section">
 
-                    <h3>Category & Status</h3>
-
+                    <h2>Category & Status</h2>
 
                     <div className="form-grid">
 
                         <div className="form-group">
 
-                            <label>
+                            <label htmlFor="categoryId">
                                 Category *
                             </label>
 
                             <select
+                                id="categoryId"
                                 name="categoryId"
                                 value={formData.categoryId}
                                 onChange={handleChange}
                                 disabled={categoryLoading}
+                                required
+                                aria-required="true"
                             >
 
                                 <option value="">
@@ -393,14 +421,14 @@ function AddProduct() {
 
                         </div>
 
-
                         <div className="form-group">
 
-                            <label>
+                            <label htmlFor="status">
                                 Status
                             </label>
 
                             <select
+                                id="status"
                                 name="status"
                                 value={formData.status}
                                 onChange={handleChange}
@@ -422,16 +450,20 @@ function AddProduct() {
 
                 </div>
 
-
                 {/* Specifications */}
 
                 <div className="form-section">
 
-                    <h3>Specifications</h3>
+                    <h2>Specifications</h2>
 
                     <div className="form-group">
 
+                        <label htmlFor="specifications">
+                            Product Specifications
+                        </label>
+
                         <textarea
+                            id="specifications"
                             name="specifications"
                             value={formData.specifications}
                             onChange={handleChange}
@@ -443,16 +475,20 @@ function AddProduct() {
 
                 </div>
 
-
                 {/* Keywords */}
 
                 <div className="form-section">
 
-                    <h3>Keywords</h3>
+                    <h2>Keywords</h2>
 
                     <div className="form-group">
 
+                        <label htmlFor="keywords">
+                            Product Keywords
+                        </label>
+
                         <input
+                            id="keywords"
                             type="text"
                             name="keywords"
                             value={formData.keywords}
@@ -464,37 +500,43 @@ function AddProduct() {
 
                 </div>
 
-
                 {/* Images */}
 
                 <div className="form-section">
 
-                    <h3>Product Images</h3>
+                    <h2>Product Images</h2>
 
                     <div className="form-group">
 
-                        <label>
+                        <label htmlFor="productImages">
                             Upload Images
                         </label>
 
                         <input
+                            id="productImages"
                             type="file"
                             multiple
                             accept="image/*"
                             onChange={handleImageChange}
+                            aria-describedby="image-help"
                         />
 
-                        <p className="image-help">
+                        <p
+                            id="image-help"
+                            className="image-help"
+                        >
                             You can select multiple images.
                             The first image will be treated as the primary image.
                         </p>
 
                     </div>
 
-
                     {images.length > 0 && (
 
-                        <div className="selected-images">
+                        <div
+                            className="selected-images"
+                            aria-label="Selected product images"
+                        >
 
                             {images.map((image, index) => (
 
@@ -505,7 +547,11 @@ function AddProduct() {
 
                                     <img
                                         src={URL.createObjectURL(image)}
-                                        alt={image.name}
+                                        alt={
+                                            index === 0
+                                                ? `${image.name}, primary product image`
+                                                : `${image.name}, product image ${index + 1}`
+                                        }
                                     />
 
                                     <span>
@@ -525,7 +571,6 @@ function AddProduct() {
 
                 </div>
 
-
                 {/* Actions */}
 
                 <div className="form-actions">
@@ -543,13 +588,12 @@ function AddProduct() {
                         type="submit"
                         className="submit-btn"
                         disabled={loading}
+                        aria-disabled={loading}
                     >
-
                         {loading
                             ? "Adding Product..."
                             : "Add Product"
                         }
-
                     </button>
 
                 </div>
@@ -557,9 +601,7 @@ function AddProduct() {
             </form>
 
         </div>
-
     );
-
 }
 
 export default AddProduct;

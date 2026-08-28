@@ -22,12 +22,11 @@ function UserDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // PAGINATION
+    // Pagination
     const ORDERS_PER_PAGE = 5;
-
     const [currentPage, setCurrentPage] = useState(1);
 
-    // LOAD USER
+    // Load user
     useEffect(() => {
 
         const fetchUser = async () => {
@@ -44,10 +43,7 @@ function UserDetails() {
 
             } catch (err) {
 
-                console.error(
-                    "Failed to load user:",
-                    err
-                );
+                console.error("Failed to load user:", err);
 
                 setError(
                     err.response?.data?.message ||
@@ -57,6 +53,7 @@ function UserDetails() {
             } finally {
 
                 setLoading(false);
+
             }
         };
 
@@ -64,48 +61,56 @@ function UserDetails() {
 
     }, [userId]);
 
-
-    // LOADING
+    // Loading
     if (loading) {
 
         return (
             <>
                 <AdminNavBar />
 
-                <div className="admin-user-details-page">
+                <main className="admin-user-details-page">
 
                     <div className="admin-user-details-container">
 
-                        <div className="admin-user-details-loading">
+                        <div
+                            className="admin-user-details-loading"
+                            role="status"
+                            aria-live="polite"
+                        >
                             Loading user details...
                         </div>
 
                     </div>
 
-                </div>
+                </main>
             </>
         );
     }
 
-
-    // ERROR
+    // Error
     if (error || !user) {
 
         return (
             <>
                 <AdminNavBar />
 
-                <div className="admin-user-details-page">
+                <main className="admin-user-details-page">
 
                     <div className="admin-user-details-container">
 
-                        <div className="admin-user-details-error">
+                        <div
+                            className="admin-user-details-error"
+                            role="alert"
+                        >
 
-                            <UserIcon size={42} />
+                            <UserIcon
+                                size={42}
+                                aria-hidden="true"
+                            />
 
-                            <h2>
+                            <h1>
                                 Unable to load user
-                            </h2>
+                            </h1>
 
                             <p>
                                 {error || "User not found."}
@@ -115,7 +120,10 @@ function UserDetails() {
                                 to="/admin/users"
                                 className="back-to-users"
                             >
-                                <ArrowLeft size={18} />
+                                <ArrowLeft
+                                    size={18}
+                                    aria-hidden="true"
+                                />
                                 Back to Users
                             </Link>
 
@@ -123,12 +131,12 @@ function UserDetails() {
 
                     </div>
 
-                </div>
+                </main>
             </>
         );
     }
 
-    // HELPERS
+    // Helpers
     const formatDate = (date) => {
 
         if (!date) {
@@ -144,7 +152,6 @@ function UserDetails() {
         });
     };
 
-
     const formatCurrency = (amount) => {
 
         return new Intl.NumberFormat("en-IN", {
@@ -154,7 +161,6 @@ function UserDetails() {
         }).format(amount || 0);
     };
 
-
     const getStatusClass = (status) => {
 
         return String(status || "")
@@ -162,8 +168,7 @@ function UserDetails() {
             .replace(/\s+/g, "-");
     };
 
-
-    // ORDER PAGINATION
+    // Order pagination
     const orders = user.orders || [];
 
     const totalOrders = orders.length;
@@ -181,14 +186,12 @@ function UserDetails() {
     const currentOrders =
         orders.slice(startIndex, endIndex);
 
-
     const handlePreviousPage = () => {
 
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
         }
     };
-
 
     const handleNextPage = () => {
 
@@ -197,42 +200,37 @@ function UserDetails() {
         }
     };
 
-
     const handlePageChange = (page) => {
-
         setCurrentPage(page);
     };
 
-
-    // USER DETAILS PAGE
     return (
         <>
             <AdminNavBar />
 
-            <div className="admin-user-details-page">
+            <main className="admin-user-details-page">
 
                 <div className="admin-user-details-container">
 
-                    {/* ====================================================
-                        BACK
-                    ==================================================== */}
-
+                    {/* Back */}
                     <Link
                         to="/admin/users"
                         className="back-to-users"
                     >
-                        <ArrowLeft size={18} />
+                        <ArrowLeft
+                            size={18}
+                            aria-hidden="true"
+                        />
                         Back to Users
                     </Link>
 
+                    {/* Header */}
+                    <header className="admin-user-details-header">
 
-                    {/* ====================================================
-                        HEADER
-                    ==================================================== */}
-
-                    <div className="admin-user-details-header">
-
-                        <div className="user-header-icon">
+                        <div
+                            className="user-header-icon"
+                            aria-hidden="true"
+                        >
                             <UserIcon size={42} />
                         </div>
 
@@ -243,70 +241,43 @@ function UserDetails() {
                             </h1>
 
                             <p>
-                                User ID: <strong>{user.userid}</strong>
+                                User ID:{" "}
+                                <strong>{user.userid}</strong>
                             </p>
 
                         </div>
 
-                    </div>
+                    </header>
 
+                    {/* Account Information */}
+                    <section
+                        className="user-details-section"
+                        aria-labelledby="account-information-heading"
+                    >
 
-                    {/* ====================================================
-                        ACCOUNT INFORMATION
-                    ==================================================== */}
-
-                    <section className="user-details-section">
-
-                        <h2>
+                        <h2 id="account-information-heading">
                             Account Information
                         </h2>
 
                         <div className="user-account-grid">
 
                             <div className="user-info-item">
-
-                                <span>
-                                    User ID
-                                </span>
-
-                                <strong>
-                                    {user.userid}
-                                </strong>
-
+                                <span>User ID</span>
+                                <strong>{user.userid}</strong>
                             </div>
 
-
                             <div className="user-info-item">
-
-                                <span>
-                                    Username
-                                </span>
-
-                                <strong>
-                                    {user.username}
-                                </strong>
-
+                                <span>Username</span>
+                                <strong>{user.username}</strong>
                             </div>
 
-
                             <div className="user-info-item">
-
-                                <span>
-                                    Email
-                                </span>
-
-                                <strong>
-                                    {user.email}
-                                </strong>
-
+                                <span>Email</span>
+                                <strong>{user.email}</strong>
                             </div>
 
-
                             <div className="user-info-item">
-
-                                <span>
-                                    Role
-                                </span>
+                                <span>Role</span>
 
                                 <span
                                     className={`user-role ${getStatusClass(
@@ -315,47 +286,33 @@ function UserDetails() {
                                 >
                                     {user.role}
                                 </span>
-
                             </div>
 
-
                             <div className="user-info-item">
-
-                                <span>
-                                    Account Created
-                                </span>
-
+                                <span>Account Created</span>
                                 <strong>
                                     {formatDate(user.createdAt)}
                                 </strong>
-
                             </div>
 
-
                             <div className="user-info-item">
-
-                                <span>
-                                    Last Updated
-                                </span>
-
+                                <span>Last Updated</span>
                                 <strong>
                                     {formatDate(user.updatedAt)}
                                 </strong>
-
                             </div>
 
                         </div>
 
                     </section>
 
+                    {/* Order Summary */}
+                    <section
+                        className="user-details-section"
+                        aria-labelledby="order-summary-heading"
+                    >
 
-                    {/* ====================================================
-                        ORDER SUMMARY
-                    ==================================================== */}
-
-                    <section className="user-details-section">
-
-                        <h2>
+                        <h2 id="order-summary-heading">
                             Order Summary
                         </h2>
 
@@ -363,7 +320,10 @@ function UserDetails() {
 
                             <div className="user-summary-card">
 
-                                <div className="summary-icon">
+                                <div
+                                    className="summary-icon"
+                                    aria-hidden="true"
+                                >
                                     <ShoppingBag size={26} />
                                 </div>
 
@@ -381,10 +341,12 @@ function UserDetails() {
 
                             </div>
 
-
                             <div className="user-summary-card">
 
-                                <div className="summary-icon">
+                                <div
+                                    className="summary-icon"
+                                    aria-hidden="true"
+                                >
                                     <IndianRupee size={26} />
                                 </div>
 
@@ -408,16 +370,15 @@ function UserDetails() {
 
                     </section>
 
-
-                    {/* ====================================================
-                        ORDER HISTORY
-                    ==================================================== */}
-
-                    <section className="user-details-section">
+                    {/* Order History */}
+                    <section
+                        className="user-details-section"
+                        aria-labelledby="order-history-heading"
+                    >
 
                         <div className="section-heading-row">
 
-                            <h2>
+                            <h2 id="order-history-heading">
                                 Order History
                             </h2>
 
@@ -427,40 +388,40 @@ function UserDetails() {
 
                         </div>
 
-
                         {totalOrders > 0 ? (
 
                             <>
 
-                                {/* ====================================================
-                                    ORDER TABLE
-                                ==================================================== */}
-
+                                {/* Order table */}
                                 <div className="user-orders-table-wrapper">
 
                                     <table className="user-orders-table">
+
+                                        <caption className="sr-only">
+                                            Order history for {user.username}
+                                        </caption>
 
                                         <thead>
 
                                             <tr>
 
-                                                <th>
+                                                <th scope="col">
                                                     Order ID
                                                 </th>
 
-                                                <th>
+                                                <th scope="col">
                                                     Date
                                                 </th>
 
-                                                <th>
+                                                <th scope="col">
                                                     Amount
                                                 </th>
 
-                                                <th>
+                                                <th scope="col">
                                                     Payment
                                                 </th>
 
-                                                <th>
+                                                <th scope="col">
                                                     Status
                                                 </th>
 
@@ -468,28 +429,22 @@ function UserDetails() {
 
                                         </thead>
 
-
                                         <tbody>
 
                                             {currentOrders.map(
                                                 (order) => (
 
                                                     <tr
-                                                        key={
-                                                            order.orderId
-                                                        }
+                                                        key={order.orderId}
                                                     >
 
                                                         <td>
-
                                                             <strong>
                                                                 {
                                                                     order.orderId
                                                                 }
                                                             </strong>
-
                                                         </td>
-
 
                                                         <td>
                                                             {formatDate(
@@ -497,17 +452,13 @@ function UserDetails() {
                                                             )}
                                                         </td>
 
-
                                                         <td>
-
                                                             <strong>
                                                                 {formatCurrency(
                                                                     order.totalAmount
                                                                 )}
                                                             </strong>
-
                                                         </td>
-
 
                                                         <td>
 
@@ -522,7 +473,6 @@ function UserDetails() {
                                                             </span>
 
                                                         </td>
-
 
                                                         <td>
 
@@ -549,31 +499,32 @@ function UserDetails() {
 
                                 </div>
 
-
-                                {/* ====================================================
-                                    PAGINATION
-                                ==================================================== */}
-
+                                {/* Pagination */}
                                 {totalPages > 1 && (
 
-                                    <div className="user-orders-pagination">
+                                    <nav
+                                        className="user-orders-pagination"
+                                        aria-label="Order history pagination"
+                                    >
 
                                         <button
                                             type="button"
                                             className="pagination-btn pagination-prev"
-                                            onClick={
-                                                handlePreviousPage
-                                            }
-                                            disabled={
-                                                currentPage === 1
-                                            }
+                                            onClick={handlePreviousPage}
+                                            disabled={currentPage === 1}
+                                            aria-label="Go to previous page"
                                         >
-                                            <ChevronLeft size={17} />
+                                            <ChevronLeft
+                                                size={17}
+                                                aria-hidden="true"
+                                            />
                                             Previous
                                         </button>
 
-
-                                        <div className="pagination-pages">
+                                        <div
+                                            className="pagination-pages"
+                                            aria-label="Order history pages"
+                                        >
 
                                             {Array.from(
                                                 {
@@ -585,12 +536,12 @@ function UserDetails() {
                                                         index + 1;
 
                                                     return (
+
                                                         <button
                                                             type="button"
                                                             key={page}
                                                             className={`pagination-page ${
-                                                                currentPage ===
-                                                                page
+                                                                currentPage === page
                                                                     ? "active"
                                                                     : ""
                                                             }`}
@@ -599,32 +550,40 @@ function UserDetails() {
                                                                     page
                                                                 )
                                                             }
+                                                            aria-label={`Go to page ${page}`}
+                                                            aria-current={
+                                                                currentPage === page
+                                                                    ? "page"
+                                                                    : undefined
+                                                            }
                                                         >
                                                             {page}
                                                         </button>
+
                                                     );
                                                 }
                                             )}
 
                                         </div>
 
-
                                         <button
                                             type="button"
                                             className="pagination-btn pagination-next"
-                                            onClick={
-                                                handleNextPage
-                                            }
+                                            onClick={handleNextPage}
                                             disabled={
-                                                currentPage ===
-                                                totalPages
+                                                currentPage === totalPages
                                             }
+                                            aria-label="Go to next page"
                                         >
                                             Next
-                                            <ChevronRight size={17} />
+
+                                            <ChevronRight
+                                                size={17}
+                                                aria-hidden="true"
+                                            />
                                         </button>
 
-                                    </div>
+                                    </nav>
 
                                 )}
 
@@ -642,7 +601,7 @@ function UserDetails() {
 
                 </div>
 
-            </div>
+            </main>
         </>
     );
 }

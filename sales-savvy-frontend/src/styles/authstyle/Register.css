@@ -1,130 +1,386 @@
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", sans-serif;
-}
+/* ============================================================
+   REGISTER PAGE
+   ============================================================ */
 
-/* Page Background */
 .register-container {
     width: 100%;
     min-height: 100vh;
-    background: linear-gradient(135deg, #eef4ff, #dbeafe);
+
+    background: linear-gradient(
+        135deg,
+        #eef4ff,
+        #dbeafe
+    );
+
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px 0;
+
+    padding: 20px;
+
+    box-sizing: border-box;
 }
 
-/* Card */
-.register-card {
-    width: 450px;
-    background: #fff;
-    padding: 28px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-}
 
-/* Title */
-.title {
-    text-align: center;
-    color: #2563eb;
-    font-size: 32px;
-    margin-bottom: 10px;
-}
+/* ============================================================
+   REGISTER FIELDS
+   ============================================================ */
 
-/* Heading */
-.heading {
-    text-align: center;
-    color: #374151;
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-/* Subtitle */
-.subtitle {
-    text-align: center;
-    color: #6b7280;
-    margin-top:8px;
-    margin-bottom:20px;;
-}
-
-/* Form */
-.register-form {
+.register-field {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+
+    gap: 7px;
+
+    margin-bottom: 17px;
 }
 
-/* Label */
-.form-group label {
+
+.register-field label {
     display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
+
     color: #374151;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    line-height: 1.4;
 }
 
-/* Inputs */
-.form-group input,
-.form-group select {
+
+/* ============================================================
+   INPUT BOX
+   ============================================================ */
+
+.input-box {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #d1d5db;
+
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 0 12px;
+
+    background: #ffffff;
+
+    border: 1px solid #cbd5e1;
+
     border-radius: 8px;
-    outline: none;
-    font-size: 15px;
-    transition: 0.3s;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-/* Input Focus */
-.form-group input:focus,
-.form-group select:focus {
+
+.input-box:focus-within {
     border-color: #2563eb;
-    box-shadow: 0 0 5px rgba(37,99,235,0.3);
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.18);
 }
 
-/* Button */
-.register-form button {
-    margin-top: 10px;
-    padding: 12px;
+
+.input-icon {
+    flex-shrink: 0;
+
+    color: #4b5563;
+}
+
+
+.input-box input {
+    flex: 1;
+
+    min-width: 0;
+
     border: none;
-    border-radius: 8px;
-    background: #2563eb;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #111827;
+
+    font-size: 15px;
+
+    line-height: 1.5;
+
+    padding: 11px 0;
 }
 
-/* Hover */
-.register-form button:hover {
+
+.input-box input::placeholder {
+    color: #6b7280;
+}
+
+
+/* ============================================================
+   PASSWORD VISIBILITY BUTTON
+   ============================================================ */
+
+.eye-btn {
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: transparent;
+
+    color: #374151;
+
+    cursor: pointer;
+
+    padding: 0;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.eye-btn:hover {
+    background: #f3f4f6;
+
+    color: #111827;
+}
+
+
+.eye-btn:focus-visible {
+    outline: 3px solid #2563eb;
+
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   SUBMIT BUTTON
+   ============================================================ */
+
+.login-btn {
+    width: 100%;
+
+    min-height: 46px;
+
+    margin-top: 8px;
+
+    padding: 12px 18px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.login-btn:hover:not(:disabled) {
     background: #1d4ed8;
 }
 
-/* Login Link */
-.login-link {
+
+.login-btn:focus-visible {
+    outline: 3px solid #1e40af;
+
+    outline-offset: 3px;
+
+    box-shadow:
+        0 0 0 2px #ffffff;
+}
+
+
+.login-btn:disabled {
+    background: #64748b;
+
+    cursor: not-allowed;
+
+    opacity: 0.8;
+}
+
+
+/* ============================================================
+   ACCESSIBLE STATUS / ERROR MESSAGE
+   ============================================================ */
+
+.register-message {
+    min-height: 0;
+
+    margin-bottom: 10px;
+}
+
+
+.register-error,
+.register-success {
+    margin: 0;
+
+    padding: 11px 13px;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+.register-error {
+    background: #fef2f2;
+
+    border: 1px solid #dc2626;
+
+    color: #991b1b;
+}
+
+
+.register-success {
+    background: #f0fdf4;
+
+    border: 1px solid #16a34a;
+
+    color: #166534;
+}
+
+
+/* ============================================================
+   LOGIN LINK
+   ============================================================ */
+
+.register-link {
     margin-top: 20px;
+
     text-align: center;
+
+    color: #4b5563;
+
+    font-size: 14px;
+
+    line-height: 1.5;
 }
 
-.login-link a {
-    color: #2563eb;
+
+.register-link a {
+    color: #1d4ed8;
+
     text-decoration: none;
+
     font-weight: 600;
+
+    border-radius: 4px;
 }
 
-.login-link a:hover {
+
+.register-link a:hover {
     text-decoration: underline;
 }
 
-/* Responsive */
+
+.register-link a:focus-visible {
+    outline: 3px solid #2563eb;
+
+    outline-offset: 3px;
+}
+
+
+/* ============================================================
+   GENERAL KEYBOARD FOCUS
+   ============================================================ */
+
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+    outline: 3px solid #2563eb;
+
+    outline-offset: 3px;
+}
+
+
+/* ============================================================
+   INVALID CONFIRM PASSWORD
+   ============================================================ */
+
+.input-box:has(input[aria-invalid="true"]) {
+    border-color: #dc2626;
+}
+
+
+.input-box:has(input[aria-invalid="true"]):focus-within {
+    border-color: #dc2626;
+
+    box-shadow:
+        0 0 0 3px rgba(220, 38, 38, 0.18);
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 700px) {
+
+    .register-container {
+        align-items: flex-start;
+
+        padding: 15px;
+    }
+
+}
+
+
 @media (max-width: 480px) {
 
-    .register-card {
-        width: 100%;
-        padding: 30px 20px;
+    .register-container {
+        padding: 10px;
+    }
+
+    .input-box {
+        min-height: 44px;
+    }
+
+    .input-box input {
+        font-size: 16px;
+    }
+
+    .login-btn {
+        min-height: 46px;
+    }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .input-box,
+    .eye-btn,
+    .login-btn {
+        transition: none;
     }
 
 }

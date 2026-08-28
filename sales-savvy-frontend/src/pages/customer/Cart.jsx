@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import Navbar from "../../components/layout/Navbar";
+import ConfirmationDialog from "../../components/common/ConfirmationDialog";
 
 import {
     getCart,
@@ -23,7 +24,6 @@ import { createPaymentOrder } from "../../services/paymentService";
 
 import "../../styles/customer/Cart.css";
 
-
 function Cart() {
 
     const [cart, setCart] = useState({
@@ -35,15 +35,14 @@ function Cart() {
     const [loading, setLoading] = useState(true);
     const [updatingItem, setUpdatingItem] = useState(null);
 
+    const [statusMessage, setStatusMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
-    // ============================================================
-    // FETCH CART
-    // ============================================================
+    const [clearCartDialogOpen, setClearCartDialogOpen] = useState(false);
 
     useEffect(() => {
         fetchCart();
     }, []);
-
 
     const fetchCart = async () => {
 
@@ -59,30 +58,24 @@ function Cart() {
 
             console.error("Error fetching cart:", error);
 
+            setErrorMessage(
+                error.response?.data?.message ||
+                error.response?.data?.error ||
+                "Unable to load your cart."
+            );
+
         } finally {
 
             setLoading(false);
-
         }
     };
-
-
-    // ============================================================
-    // NOTIFY NAVBAR
-    // ============================================================
 
     const notifyCartUpdated = () => {
 
         window.dispatchEvent(
             new Event("cartUpdated")
         );
-
     };
-
-
-    // ============================================================
-    // INCREASE / DECREASE QUANTITY
-    // ============================================================
 
     const handleQuantityChange = async (
         cartItemId,
@@ -93,16 +86,15 @@ function Cart() {
         const newQuantity =
             currentQuantity + change;
 
-
         if (newQuantity < 1) {
             return;
         }
 
-
         try {
 
+            setErrorMessage("");
+            setStatusMessage("");
             setUpdatingItem(cartItemId);
-
 
             const response =
                 await updateCartItem(
@@ -110,122 +102,121 @@ function Cart() {
                     newQuantity
                 );
 
-
-            // Update cart page immediately
             setCart(response.data);
 
-
-            // Tell Navbar to update immediately
             notifyCartUpdated();
 
+            setStatusMessage(
+                "Cart quantity updated."
+            );
 
         } catch (error) {
 
-            alert(
+            console.error(
+                "Unable to update quantity:",
+                error
+            );
+
+            setErrorMessage(
                 error.response?.data?.message ||
                 error.response?.data?.error ||
-                "Unable to update quantity"
+                "Unable to update quantity."
             );
 
         } finally {
 
             setUpdatingItem(null);
-
         }
     };
 
-
-    // ============================================================
-    // REMOVE ITEM
-    // ============================================================
-
-    const handleRemove = async (cartItemId) => {
+    const handleRemove = async (
+        cartItemId,
+        productName
+    ) => {
 
         try {
 
+            setErrorMessage("");
+            setStatusMessage("");
             setUpdatingItem(cartItemId);
-
 
             await removeCartItem(cartItemId);
 
-
-            // Refresh cart
             await fetchCart();
 
-
-            // Tell Navbar to update immediately
             notifyCartUpdated();
 
+            setStatusMessage(
+                `${productName} was removed from your cart.`
+            );
 
         } catch (error) {
 
-            alert(
+            console.error(
+                "Unable to remove product:",
+                error
+            );
+
+            setErrorMessage(
                 error.response?.data?.message ||
                 error.response?.data?.error ||
-                "Unable to remove product"
+                "Unable to remove product."
             );
 
         } finally {
 
             setUpdatingItem(null);
-
         }
     };
 
+    const openClearCartDialog = () => {
 
-    // ============================================================
-    // CLEAR CART
-    // ============================================================
+        setErrorMessage("");
+        setStatusMessage("");
+
+        setClearCartDialogOpen(true);
+    };
 
     const handleClearCart = async () => {
 
-        const confirmed =
-            window.confirm(
-                "Are you sure you want to clear your cart?"
-            );
-
-
-        if (!confirmed) {
-            return;
-        }
-
+        setClearCartDialogOpen(false);
 
         try {
 
+            setErrorMessage("");
+            setStatusMessage("");
+
             await clearCart();
 
-
-            // Refresh cart
             await fetchCart();
 
-
-            // Tell Navbar to update immediately
             notifyCartUpdated();
 
+            setStatusMessage(
+                "Your cart has been cleared."
+            );
 
         } catch (error) {
 
-            alert(
-                error.response?.data?.message ||
-                error.response?.data?.error ||
-                "Unable to clear cart"
+            console.error(
+                "Unable to clear cart:",
+                error
             );
 
+            setErrorMessage(
+                error.response?.data?.message ||
+                error.response?.data?.error ||
+                "Unable to clear cart."
+            );
         }
     };
-
-
-    // ============================================================
-    // RAZORPAY CHECKOUT
-    // ============================================================
 
     const handleCheckout = async () => {
 
         try {
 
-            // ----------------------------------------------------
-            // STEP 1: Create Sales Savvy Order
-            // ----------------------------------------------------
+            setErrorMessage("");
+            setStatusMessage("");
 
             const orderResponse = await axios.post(
                 "http://localhost:8080/api/orders",
@@ -235,17 +226,13 @@ function Cart() {
                 }
             );
 
-            const salesSavvyOrder = orderResponse.data;
+            const salesSavvyOrder =
+                orderResponse.data;
 
             console.log(
                 "Sales Savvy Order:",
                 salesSavvyOrder
             );
-
-
-            // ----------------------------------------------------
-            // STEP 2: Create Razorpay Order
-            // ----------------------------------------------------
 
             const paymentResponse =
                 await createPaymentOrder(
@@ -260,24 +247,14 @@ function Cart() {
                 paymentData
             );
 
-
-            // ----------------------------------------------------
-            // STEP 3: Check Razorpay Checkout Script
-            // ----------------------------------------------------
-
             if (!window.Razorpay) {
 
-                alert(
+                setErrorMessage(
                     "Razorpay Checkout is not loaded. Please refresh the page."
                 );
 
                 return;
             }
-
-
-            // ----------------------------------------------------
-            // STEP 4: Razorpay Checkout Options
-            // ----------------------------------------------------
 
             const options = {
 
@@ -295,11 +272,6 @@ function Cart() {
                 order_id:
                     paymentData.razorpayOrderId,
 
-
-                // ------------------------------------------------
-                // PAYMENT SUCCESS
-                // ------------------------------------------------
-
                 handler: async function (response) {
 
                     console.log(
@@ -308,10 +280,6 @@ function Cart() {
                     );
 
                     try {
-
-                        // ----------------------------------------
-                        // STEP 5: Verify payment with backend
-                        // ----------------------------------------
 
                         await axios.post(
                             "http://localhost:8080/api/payment/verify",
@@ -333,20 +301,12 @@ function Cart() {
                             }
                         );
 
-
-                        // ----------------------------------------
-                        // Payment verified
-                        // ----------------------------------------
-
-                        alert(
+                        setStatusMessage(
                             "Payment successful! Your order has been confirmed."
                         );
 
-
-                        // Refresh cart
                         await fetchCart();
 
-                        // Update Navbar cart count
                         notifyCartUpdated();
 
                     } catch (error) {
@@ -356,7 +316,7 @@ function Cart() {
                             error
                         );
 
-                        alert(
+                        setErrorMessage(
                             error.response?.data?.message ||
                             error.response?.data?.error ||
                             "Payment verification failed."
@@ -364,30 +324,15 @@ function Cart() {
                     }
                 },
 
-
-                // ------------------------------------------------
-                // PREFILL
-                // ------------------------------------------------
-
                 prefill: {
                     name: "",
                     email: ""
                 },
 
-
-                // ------------------------------------------------
-                // THEME
-                // ------------------------------------------------
-
                 theme: {
                     color: "#3399cc"
                 }
             };
-
-
-            // ----------------------------------------------------
-            // STEP 6: Open Razorpay
-            // ----------------------------------------------------
 
             const razorpay =
                 new window.Razorpay(options);
@@ -401,18 +346,13 @@ function Cart() {
                 error
             );
 
-            alert(
+            setErrorMessage(
                 error.response?.data?.message ||
                 error.response?.data?.error ||
-                "Unable to start checkout"
+                "Unable to start checkout."
             );
         }
     };
-
-
-    // ============================================================
-    // LOADING
-    // ============================================================
 
     if (loading) {
 
@@ -420,23 +360,23 @@ function Cart() {
             <>
                 <Navbar />
 
-                <div className="cart-loading">
+                <main
+                    className="cart-loading"
+                    aria-busy="true"
+                    aria-live="polite"
+                >
+                    <ShoppingCart
+                        size={42}
+                        aria-hidden="true"
+                    />
 
-                    <ShoppingCart size={42} />
-
-                    <h2>
+                    <h1>
                         Loading your cart...
-                    </h2>
-
-                </div>
+                    </h1>
+                </main>
             </>
         );
     }
-
-
-    // ============================================================
-    // EMPTY CART
-    // ============================================================
 
     if (!cart.items || cart.items.length === 0) {
 
@@ -444,9 +384,12 @@ function Cart() {
             <>
                 <Navbar />
 
-                <div className="empty-cart">
+                <main className="empty-cart">
 
-                    <div className="empty-cart-icon">
+                    <div
+                        className="empty-cart-icon"
+                        aria-hidden="true"
+                    >
                         <ShoppingCart size={70} />
                     </div>
 
@@ -459,34 +402,47 @@ function Cart() {
                         anything to your cart yet.
                     </p>
 
+                    {errorMessage && (
+                        <div
+                            className="cart-error-message"
+                            role="alert"
+                        >
+                            {errorMessage}
+                        </div>
+                    )}
+
+                    {statusMessage && (
+                        <div
+                            className="cart-status-message"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            {statusMessage}
+                        </div>
+                    )}
+
                     <Link
                         to="/products"
                         className="continue-shopping-btn"
                     >
-
-                        <ShoppingBag size={20} />
+                        <ShoppingBag
+                            size={20}
+                            aria-hidden="true"
+                        />
 
                         Continue Shopping
-
                     </Link>
 
-                </div>
+                </main>
             </>
         );
     }
-
-
-    // ============================================================
-    // CART PAGE
-    // ============================================================
 
     return (
         <>
             <Navbar />
 
             <main className="cart-page">
-
-                {/* HEADER */}
 
                 <div className="cart-header">
 
@@ -496,43 +452,65 @@ function Cart() {
                             Shopping Cart
                         </h1>
 
-                        <p>
-
+                        <p id="cart-item-count">
                             {cart.totalItems}{" "}
-
                             {cart.totalItems === 1
                                 ? "item"
                                 : "items"}{" "}
-
                             in your cart
-
                         </p>
 
                     </div>
 
-
                     <button
                         className="clear-cart-btn"
-                        onClick={handleClearCart}
+                        type="button"
+                        onClick={openClearCartDialog}
+                        aria-label="Clear all items from your cart"
                     >
-
-                        <Trash2 size={18} />
+                        <Trash2
+                            size={18}
+                            aria-hidden="true"
+                        />
 
                         Clear Cart
-
                     </button>
 
                 </div>
 
+                {errorMessage && (
+                    <div
+                        className="cart-error-message"
+                        role="alert"
+                        aria-live="assertive"
+                    >
+                        {errorMessage}
+                    </div>
+                )}
+
+                {statusMessage && (
+                    <div
+                        className="cart-status-message"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        {statusMessage}
+                    </div>
+                )}
 
                 <div className="cart-layout">
 
+                    <section
+                        className="cart-items-section"
+                        aria-labelledby="cart-items-heading"
+                    >
 
-                    {/* ================================================= */}
-                    {/* CART ITEMS */}
-                    {/* ================================================= */}
-
-                    <section className="cart-items-section">
+                        <h2
+                            id="cart-items-heading"
+                            className="visually-hidden"
+                        >
+                            Cart items
+                        </h2>
 
                         {cart.items.map((item) => {
 
@@ -541,35 +519,31 @@ function Cart() {
                                 Number(item.discountPrice) <
                                 Number(item.price);
 
-
                             const unitPrice =
                                 hasDiscount
                                     ? Number(item.discountPrice)
                                     : Number(item.price);
 
+                            const isUpdating =
+                                updatingItem ===
+                                item.cartItemId;
 
                             return (
-
                                 <article
                                     className="cart-item"
                                     key={item.cartItemId}
+                                    aria-label={`Cart item: ${item.productName}`}
                                 >
-
-
-                                    {/* IMAGE */}
 
                                     <div className="cart-item-image-container">
 
                                         <img
                                             src={item.imageUrl}
-                                            alt={item.productName}
+                                            alt=""
                                             className="cart-item-image"
                                         />
 
                                     </div>
-
-
-                                    {/* PRODUCT DETAILS */}
 
                                     <div className="cart-item-details">
 
@@ -580,67 +554,64 @@ function Cart() {
                                             {item.productName}
                                         </Link>
 
-
                                         <p className="cart-product-brand">
                                             {item.brand}
                                         </p>
 
-
                                         <div className="cart-price">
 
                                             <span className="current-price">
-
                                                 ₹{" "}
-
                                                 {unitPrice.toLocaleString(
                                                     "en-IN"
                                                 )}
-
                                             </span>
 
-
                                             {hasDiscount && (
-
-                                                <span className="original-price">
-
+                                                <span
+                                                    className="original-price"
+                                                    aria-label={`Original price ₹${Number(
+                                                        item.price
+                                                    ).toLocaleString("en-IN")}`}
+                                                >
                                                     ₹{" "}
-
                                                     {Number(
                                                         item.price
                                                     ).toLocaleString(
                                                         "en-IN"
                                                     )}
-
                                                 </span>
-
                                             )}
 
                                         </div>
 
                                     </div>
 
-
-                                    {/* QUANTITY */}
-
                                     <div className="quantity-section">
 
-                                        <span className="quantity-label">
+                                        <span
+                                            className="quantity-label"
+                                            id={`quantity-label-${item.cartItemId}`}
+                                        >
                                             Quantity
                                         </span>
 
-
-                                        <div className="quantity-control">
-
-
-                                            {/* MINUS */}
+                                        <div
+                                            className="quantity-control"
+                                            role="group"
+                                            aria-labelledby={`quantity-label-${item.cartItemId}`}
+                                        >
 
                                             <button
                                                 type="button"
                                                 aria-label={`Decrease quantity of ${item.productName}`}
+                                                aria-disabled={
+                                                    item.quantity <= 1 ||
+                                                    isUpdating
+                                                }
                                                 disabled={
                                                     item.quantity <= 1 ||
-                                                    updatingItem ===
-                                                    item.cartItemId
+                                                    isUpdating
                                                 }
                                                 onClick={() =>
                                                     handleQuantityChange(
@@ -650,28 +621,25 @@ function Cart() {
                                                     )
                                                 }
                                             >
-
-                                                <Minus size={16} />
-
+                                                <Minus
+                                                    size={18}
+                                                    aria-hidden="true"
+                                                />
                                             </button>
 
-
-                                            {/* CURRENT QUANTITY */}
-
-                                            <span>
+                                            <span
+                                                aria-live="polite"
+                                                aria-atomic="true"
+                                                aria-label={`Quantity ${item.quantity}`}
+                                            >
                                                 {item.quantity}
                                             </span>
-
-
-                                            {/* PLUS */}
 
                                             <button
                                                 type="button"
                                                 aria-label={`Increase quantity of ${item.productName}`}
-                                                disabled={
-                                                    updatingItem ===
-                                                    item.cartItemId
-                                                }
+                                                aria-disabled={isUpdating}
+                                                disabled={isUpdating}
                                                 onClick={() =>
                                                     handleQuantityChange(
                                                         item.cartItemId,
@@ -680,17 +648,15 @@ function Cart() {
                                                     )
                                                 }
                                             >
-
-                                                <Plus size={16} />
-
+                                                <Plus
+                                                    size={18}
+                                                    aria-hidden="true"
+                                                />
                                             </button>
 
                                         </div>
 
                                     </div>
-
-
-                                    {/* ITEM TOTAL */}
 
                                     <div className="cart-item-total">
 
@@ -698,96 +664,70 @@ function Cart() {
                                             Item Total
                                         </span>
 
-
                                         <strong>
-
                                             ₹{" "}
-
                                             {Number(
                                                 item.itemTotal
                                             ).toLocaleString(
                                                 "en-IN"
                                             )}
-
                                         </strong>
 
                                     </div>
-
-
-                                    {/* REMOVE */}
 
                                     <button
                                         type="button"
                                         className="remove-item-btn"
                                         aria-label={`Remove ${item.productName} from cart`}
-                                        disabled={
-                                            updatingItem ===
-                                            item.cartItemId
-                                        }
+                                        disabled={isUpdating}
                                         onClick={() =>
                                             handleRemove(
-                                                item.cartItemId
+                                                item.cartItemId,
+                                                item.productName
                                             )
                                         }
                                     >
-
-                                        <Trash2 size={19} />
-
+                                        <Trash2
+                                            size={19}
+                                            aria-hidden="true"
+                                        />
                                     </button>
 
                                 </article>
-
                             );
-
                         })}
 
                     </section>
 
+                    <aside
+                        className="cart-summary"
+                        aria-labelledby="order-summary-heading"
+                    >
 
-                    {/* ================================================= */}
-                    {/* ORDER SUMMARY */}
-                    {/* ================================================= */}
-
-                    <aside className="cart-summary">
-
-                        <h2>
+                        <h2 id="order-summary-heading">
                             Order Summary
                         </h2>
 
-
                         <div className="summary-row">
-
-                            <span>
-                                Items
-                            </span>
+                            <span>Items</span>
 
                             <span>
                                 {cart.totalItems}
                             </span>
-
                         </div>
 
-
                         <div className="summary-row">
+                            <span>Subtotal</span>
 
                             <span>
-                                Subtotal
-                            </span>
-
-                            <span>
-
                                 ₹{" "}
-
                                 {Number(
                                     cart.totalAmount
                                 ).toLocaleString(
                                     "en-IN"
                                 )}
-
                             </span>
-
                         </div>
-
 
                         <div className="summary-row">
 
@@ -801,9 +741,10 @@ function Cart() {
 
                         </div>
 
-
-                        <div className="summary-divider" />
-
+                        <div
+                            className="summary-divider"
+                            aria-hidden="true"
+                        />
 
                         <div className="summary-total">
 
@@ -812,39 +753,34 @@ function Cart() {
                             </span>
 
                             <strong>
-
                                 ₹{" "}
-
                                 {Number(
                                     cart.totalAmount
                                 ).toLocaleString(
                                     "en-IN"
                                 )}
-
                             </strong>
 
                         </div>
 
-
                         <button
                             className="checkout-btn"
                             type="button"
-                            onClick={() => handleCheckout()
-                            }
+                            onClick={handleCheckout}
                         >
                             Proceed to Checkout
                         </button>
-
 
                         <Link
                             to="/products"
                             className="back-shopping-link"
                         >
-
-                            <ArrowLeft size={18} />
+                            <ArrowLeft
+                                size={18}
+                                aria-hidden="true"
+                            />
 
                             Continue Shopping
-
                         </Link>
 
                     </aside>
@@ -852,9 +788,20 @@ function Cart() {
                 </div>
 
             </main>
+
+            <ConfirmationDialog
+                isOpen={clearCartDialogOpen}
+                title="Clear your cart?"
+                message="Are you sure you want to remove all items from your cart? This action cannot be undone."
+                confirmText="Clear Cart"
+                cancelText="Cancel"
+                onConfirm={handleClearCart}
+                onCancel={() => setClearCartDialogOpen(false)}
+                danger
+            />
+
         </>
     );
 }
-
 
 export default Cart;

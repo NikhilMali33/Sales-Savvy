@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ShoppingBag, Lock, Eye, EyeOff } from "lucide-react";
+import {
+    ShoppingBag,
+    Lock,
+    Eye,
+    EyeOff
+} from "lucide-react";
+
 import loginIllustration from "../../assets/images/login.svg";
 import "../../styles/authstyle/auth.css";
 import { resetPassword } from "../../services/authService";
+import ConfirmationDialog from "../../components/common/ConfirmationDialog";
 
 const ResetPassword = () => {
 
@@ -20,21 +27,52 @@ const ResetPassword = () => {
         confirmPassword: "",
     });
 
+    const [dialog, setDialog] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "error"
+    });
+
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+
+        const { name, value } = e.target;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
+
+
+    const closeDialog = () => {
+
+        setDialog({
+            isOpen: false,
+            title: "",
+            message: "",
+            type: "error"
+        });
+
+    };
+
 
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
         if (formData.newPassword !== formData.confirmPassword) {
-            alert("Passwords do not match");
+
+            setDialog({
+                isOpen: true,
+                title: "Password mismatch",
+                message: "The passwords you entered do not match. Please check both fields and try again.",
+                type: "error"
+            });
+
             return;
         }
+
 
         try {
 
@@ -43,126 +81,269 @@ const ResetPassword = () => {
                 newPassword: formData.newPassword,
             });
 
-            alert(response.data.message);
 
-            navigate("/");
+            setDialog({
+                isOpen: true,
+                title: "Password reset successful",
+                message:
+                    response.data.message ||
+                    "Your password has been reset successfully.",
+                type: "success"
+            });
+
 
         } catch (error) {
 
-            alert(
-                error.response?.data?.message ||
-                "Failed to reset password"
-            );
+            setDialog({
+                isOpen: true,
+                title: "Password reset failed",
+                message:
+                    error.response?.data?.message ||
+                    "Failed to reset password. Please try again.",
+                type: "error"
+            });
 
         }
 
     };
 
+
+    const handleDialogConfirm = () => {
+
+        closeDialog();
+
+        if (dialog.type === "success") {
+            navigate("/");
+        }
+
+    };
+
+
     return (
         <div className="auth-container">
 
+            {/* LEFT PANEL */}
+
             <div className="left-panel">
 
-                <div className="logo">
-                    <ShoppingBag size={28} />
-                    <span>SalesSavvy</span>
+                <div
+                    className="logo"
+                    aria-label="SalesSavvy"
+                >
+
+                    <ShoppingBag
+                        size={28}
+                        aria-hidden="true"
+                    />
+
+                    <span>
+                        SalesSavvy
+                    </span>
+
                 </div>
+
 
                 <img
                     src={loginIllustration}
-                    alt="Reset Password"
+                    alt=""
                     className="login-image"
                 />
 
             </div>
 
+
+            {/* RIGHT PANEL */}
+
             <div className="right-panel">
 
-                <div className="login-card">
+                <main
+                    className="login-card"
+                    aria-labelledby="reset-password-title"
+                >
 
-                    <h2>Reset Password</h2>
+                    <h1 id="reset-password-title">
+                        Reset Password
+                    </h1>
 
                     <p className="subtitle">
                         Create your new password.
                     </p>
 
-                    <form onSubmit={handleSubmit}>
 
-                        <label>New Password</label>
+                    <form
+                        onSubmit={handleSubmit}
+                        noValidate
+                    >
 
-                        <div className="input-box">
+                        {/* NEW PASSWORD */}
 
-                            <Lock size={18} />
+                        <div className="form-field">
 
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                name="newPassword"
-                                placeholder="Enter new password"
-                                value={formData.newPassword}
-                                onChange={handleChange}
-                                required
-                            />
+                            <label htmlFor="new-password">
+                                New Password
+                            </label>
 
-                            <button
-                                type="button"
-                                className="eye-btn"
-                                onClick={() =>
-                                    setShowPassword(!showPassword)
-                                }
-                            >
-                                {showPassword ? (
-                                    <EyeOff size={18} />
-                                ) : (
-                                    <Eye size={18} />
-                                )}
-                            </button>
+                            <div className="input-box">
+
+                                <Lock
+                                    size={18}
+                                    aria-hidden="true"
+                                />
+
+                                <input
+                                    id="new-password"
+                                    type={
+                                        showPassword
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    name="newPassword"
+                                    placeholder="Enter new password"
+                                    value={formData.newPassword}
+                                    onChange={handleChange}
+                                    autoComplete="new-password"
+                                    required
+                                    aria-required="true"
+                                />
+
+                                <button
+                                    type="button"
+                                    className="eye-btn"
+                                    onClick={() =>
+                                        setShowPassword(
+                                            !showPassword
+                                        )
+                                    }
+                                    aria-label={
+                                        showPassword
+                                            ? "Hide new password"
+                                            : "Show new password"
+                                    }
+                                    aria-pressed={showPassword}
+                                >
+
+                                    {showPassword ? (
+                                        <EyeOff
+                                            size={18}
+                                            aria-hidden="true"
+                                        />
+                                    ) : (
+                                        <Eye
+                                            size={18}
+                                            aria-hidden="true"
+                                        />
+                                    )}
+
+                                </button>
+
+                            </div>
 
                         </div>
 
-                        <label>Confirm Password</label>
 
-                        <div className="input-box">
+                        {/* CONFIRM PASSWORD */}
 
-                            <Lock size={18} />
+                        <div className="form-field">
 
-                            <input
-                                type={showConfirmPassword ? "text" : "password"}
-                                name="confirmPassword"
-                                placeholder="Confirm password"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                required
-                            />
+                            <label htmlFor="confirm-password">
+                                Confirm Password
+                            </label>
 
-                            <button
-                                type="button"
-                                className="eye-btn"
-                                onClick={() =>
-                                    setShowConfirmPassword(!showConfirmPassword)
-                                }
-                            >
-                                {showConfirmPassword ? (
-                                    <EyeOff size={18} />
-                                ) : (
-                                    <Eye size={18} />
-                                )}
-                            </button>
+                            <div className="input-box">
+
+                                <Lock
+                                    size={18}
+                                    aria-hidden="true"
+                                />
+
+                                <input
+                                    id="confirm-password"
+                                    type={
+                                        showConfirmPassword
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    name="confirmPassword"
+                                    placeholder="Confirm password"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    autoComplete="new-password"
+                                    required
+                                    aria-required="true"
+                                />
+
+                                <button
+                                    type="button"
+                                    className="eye-btn"
+                                    onClick={() =>
+                                        setShowConfirmPassword(
+                                            !showConfirmPassword
+                                        )
+                                    }
+                                    aria-label={
+                                        showConfirmPassword
+                                            ? "Hide confirm password"
+                                            : "Show confirm password"
+                                    }
+                                    aria-pressed={
+                                        showConfirmPassword
+                                    }
+                                >
+
+                                    {showConfirmPassword ? (
+                                        <EyeOff
+                                            size={18}
+                                            aria-hidden="true"
+                                        />
+                                    ) : (
+                                        <Eye
+                                            size={18}
+                                            aria-hidden="true"
+                                        />
+                                    )}
+
+                                </button>
+
+                            </div>
 
                         </div>
 
-                        <button className="login-btn" type="submit">
+
+                        <button
+                            className="login-btn"
+                            type="submit"
+                        >
                             Reset Password
                         </button>
 
                     </form>
 
+
                     <p className="register-link">
-                        <Link to="/">Back to Login</Link>
+
+                        <Link to="/">
+                            Back to Login
+                        </Link>
+
                     </p>
 
-                </div>
+                </main>
 
             </div>
+
+
+            {/* ACCESSIBLE FEEDBACK DIALOG */}
+
+            <ConfirmationDialog
+                isOpen={dialog.isOpen}
+                title={dialog.title}
+                message={dialog.message}
+                confirmText="OK"
+                cancelText=""
+                onConfirm={handleDialogConfirm}
+                onCancel={closeDialog}
+                danger={dialog.type === "error"}
+            />
 
         </div>
     );

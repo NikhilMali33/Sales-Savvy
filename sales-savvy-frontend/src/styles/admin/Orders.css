@@ -1,7 +1,3 @@
-/* ============================================================
-   ADMIN ORDERS PAGE
-   ============================================================ */
-
 .admin-orders-page {
     min-height: calc(100vh - 70px);
     padding: 40px 24px;
@@ -13,10 +9,7 @@
     margin: 0 auto;
 }
 
-
-/* ============================================================
-   HEADER
-   ============================================================ */
+/* Header */
 
 .admin-orders-header {
     display: flex;
@@ -36,10 +29,7 @@
     color: #666;
 }
 
-
-/* ============================================================
-   ORDERS LIST
-   ============================================================ */
+/* Orders list */
 
 .admin-orders-list {
     display: flex;
@@ -47,10 +37,7 @@
     gap: 18px;
 }
 
-
-/* ============================================================
-   ORDER CARD
-   ============================================================ */
+/* Order card */
 
 .admin-order-card {
     background: white;
@@ -59,10 +46,7 @@
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
 }
 
-
-/* ============================================================
-   ORDER HEADER
-   ============================================================ */
+/* Order header */
 
 .admin-order-header {
     display: flex;
@@ -87,10 +71,7 @@
     font-size: 16px;
 }
 
-
-/* ============================================================
-   CUSTOMER INFORMATION
-   ============================================================ */
+/* Customer */
 
 .admin-order-customer {
     display: flex;
@@ -104,11 +85,9 @@
     width: 42px;
     height: 42px;
     border-radius: 50%;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     background: #f3f4f6;
 }
 
@@ -132,10 +111,7 @@
     color: #666;
 }
 
-
-/* ============================================================
-   ORDER BODY
-   ============================================================ */
+/* Order information */
 
 .admin-order-body {
     display: flex;
@@ -155,10 +131,7 @@
     font-size: 17px;
 }
 
-
-/* ============================================================
-   PAYMENT STATUS
-   ============================================================ */
+/* Payment status */
 
 .payment-status {
     font-weight: 600;
@@ -178,10 +151,7 @@
     color: #d32f2f;
 }
 
-
-/* ============================================================
-   ORDER STATUS
-   ============================================================ */
+/* Order status */
 
 .order-status {
     font-weight: 600;
@@ -212,41 +182,27 @@
     color: #dc2626;
 }
 
-
-/* ============================================================
-   VIEW DETAILS BUTTON
-   ============================================================ */
+/* View details */
 
 .admin-view-order-btn {
     margin-left: auto;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     gap: 8px;
-
     min-width: 138px;
-    height: 42px;
-
+    min-height: 42px;
     padding: 0 18px;
-
     border: none;
     border-radius: 8px;
-
     background: #111827;
     color: #ffffff;
-
     cursor: pointer;
-
     font-family: inherit;
     font-size: 14px;
     font-weight: 600;
-
     text-decoration: none;
-
     white-space: nowrap;
-
     transition:
         background 0.2s ease,
         transform 0.15s ease,
@@ -262,9 +218,7 @@
     background: #1f2937;
     color: #ffffff;
     text-decoration: none;
-
     transform: translateY(-1px);
-
     box-shadow: 0 4px 10px rgba(17, 24, 39, 0.18);
 }
 
@@ -274,32 +228,110 @@
 }
 
 .admin-view-order-btn:focus {
-    outline: none;
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
     color: #ffffff;
     text-decoration: none;
-
-    box-shadow:
-        0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
 .admin-view-order-btn svg {
     flex-shrink: 0;
 }
 
+/* Pagination */
 
-/* ============================================================
-   LOADING
-   ============================================================ */
+.orders-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 30px;
+}
+
+.pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pagination-btn,
+.pagination-page {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px 12px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+
+    background: white;
+    color: #374151;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled),
+.pagination-page:hover:not(.active) {
+    background: #f3f4f6;
+}
+
+.pagination-btn:focus-visible,
+.pagination-page:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
+}
+
+.pagination-page.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-status {
+    margin: 14px 0 0;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Screen reader only */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Loading */
 
 .admin-orders-loading {
     text-align: center;
     padding: 70px 20px;
 }
 
+.admin-orders-loading h1 {
+    margin-bottom: 10px;
+}
 
-/* ============================================================
-   ERROR
-   ============================================================ */
+.admin-orders-loading p {
+    color: #666;
+}
+
+/* Error */
 
 .admin-orders-error {
     text-align: center;
@@ -307,16 +339,12 @@
     color: #dc2626;
 }
 
-
-/* ============================================================
-   EMPTY STATE
-   ============================================================ */
+/* Empty state */
 
 .admin-orders-empty {
     background: white;
     border-radius: 12px;
     padding: 70px 20px;
-
     text-align: center;
 }
 
@@ -325,10 +353,11 @@
     margin-bottom: 10px;
 }
 
+.admin-orders-empty p {
+    color: #666;
+}
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* Responsive */
 
 @media (max-width: 768px) {
 
@@ -352,5 +381,59 @@
     .admin-view-order-btn {
         margin-left: 0;
         width: 100%;
+    }
+
+    .orders-pagination {
+        flex-wrap: wrap;
+    }
+
+    .pagination-pages {
+        order: -1;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .pagination-btn {
+        flex: 1;
+        max-width: 140px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .admin-order-card {
+        padding: 18px;
+    }
+
+    .admin-order-header {
+        gap: 15px;
+    }
+
+    .admin-order-header strong {
+        font-size: 14px;
+    }
+
+    .admin-order-body {
+        gap: 18px;
+    }
+
+    .admin-order-info {
+        min-width: calc(50% - 10px);
+    }
+
+    .pagination-page {
+        min-width: 44px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }

@@ -5,10 +5,21 @@ function ProductCard({ product }) {
 
     const navigate = useNavigate();
 
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            navigate(`/products/${product.productId}`);
+        }
+    };
+
     return (
         <div
             className="product-card"
             onClick={() => navigate(`/products/${product.productId}`)}
+            onKeyDown={handleKeyDown}
+            tabIndex="0"
+            role="link"
+            aria-label={`View ${product.productName}`}
         >
 
             <img

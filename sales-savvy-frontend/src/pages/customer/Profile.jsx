@@ -30,6 +30,9 @@ function Profile() {
 
             try {
 
+                setLoading(true);
+                setError("");
+
                 const response = await fetch(
                     "http://localhost:8080/api/users/profile",
                     {
@@ -38,8 +41,7 @@ function Profile() {
                     }
                 );
 
-                const data =
-                    await response.json();
+                const data = await response.json();
 
                 if (!response.ok) {
 
@@ -85,13 +87,31 @@ function Profile() {
             <>
                 <Navbar />
 
-                <div className="profile-page">
+                <main
+                    className="profile-page"
+                    aria-labelledby="profile-loading-title"
+                >
 
-                    <div className="profile-loading">
-                        Loading profile...
+                    <div
+                        className="profile-loading"
+                        role="status"
+                        aria-live="polite"
+                    >
+
+                        <h1
+                            id="profile-loading-title"
+                            className="visually-hidden"
+                        >
+                            Loading profile
+                        </h1>
+
+                        <span>
+                            Loading profile...
+                        </span>
+
                     </div>
 
-                </div>
+                </main>
             </>
         );
     }
@@ -107,15 +127,24 @@ function Profile() {
             <>
                 <Navbar />
 
-                <div className="profile-page">
+                <main
+                    className="profile-page"
+                    aria-labelledby="profile-error-title"
+                >
 
-                    <div className="profile-error">
+                    <div
+                        className="profile-error"
+                        role="alert"
+                    >
 
-                        <UserCircle size={55} />
+                        <UserCircle
+                            size={55}
+                            aria-hidden="true"
+                        />
 
-                        <h2>
+                        <h1 id="profile-error-title">
                             Unable to Load Profile
-                        </h2>
+                        </h1>
 
                         <p>
                             {error}
@@ -130,7 +159,7 @@ function Profile() {
 
                     </div>
 
-                </div>
+                </main>
             </>
         );
     }
@@ -149,7 +178,10 @@ function Profile() {
         <>
             <Navbar />
 
-            <div className="profile-page">
+            <main
+                className="profile-page"
+                aria-labelledby="profile-page-title"
+            >
 
                 <div className="profile-container">
 
@@ -161,18 +193,26 @@ function Profile() {
                         className="profile-back-link"
                     >
 
-                        <ArrowLeft size={18} />
+                        <ArrowLeft
+                            size={18}
+                            aria-hidden="true"
+                        />
 
-                        Back to Products
+                        <span>
+                            Back to Products
+                        </span>
 
                     </Link>
 
 
                     {/* HEADER */}
 
-                    <div className="profile-header">
+                    <header className="profile-header">
 
-                        <div className="profile-avatar">
+                        <div
+                            className="profile-avatar"
+                            aria-hidden="true"
+                        >
 
                             <UserCircle size={70} />
 
@@ -180,7 +220,7 @@ function Profile() {
 
                         <div>
 
-                            <h1>
+                            <h1 id="profile-page-title">
                                 My Profile
                             </h1>
 
@@ -190,19 +230,32 @@ function Profile() {
 
                         </div>
 
-                    </div>
+                    </header>
 
 
                     {/* PROFILE CARD */}
 
-                    <div className="profile-card">
+                    <section
+                        className="profile-card"
+                        aria-labelledby="profile-information-title"
+                    >
+
+                        <h2
+                            id="profile-information-title"
+                            className="visually-hidden"
+                        >
+                            Profile Information
+                        </h2>
 
 
                         {/* USERNAME */}
 
                         <div className="profile-info-row">
 
-                            <div className="profile-info-icon">
+                            <div
+                                className="profile-info-icon"
+                                aria-hidden="true"
+                            >
 
                                 <UserCircle size={22} />
 
@@ -227,7 +280,10 @@ function Profile() {
 
                         <div className="profile-info-row">
 
-                            <div className="profile-info-icon">
+                            <div
+                                className="profile-info-icon"
+                                aria-hidden="true"
+                            >
 
                                 <Mail size={22} />
 
@@ -252,7 +308,10 @@ function Profile() {
 
                         <div className="profile-info-row">
 
-                            <div className="profile-info-icon">
+                            <div
+                                className="profile-info-icon"
+                                aria-hidden="true"
+                            >
 
                                 <ShieldCheck size={22} />
 
@@ -277,7 +336,10 @@ function Profile() {
 
                         <div className="profile-info-row">
 
-                            <div className="profile-info-icon">
+                            <div
+                                className="profile-info-icon"
+                                aria-hidden="true"
+                            >
 
                                 <UserCircle size={22} />
 
@@ -298,26 +360,32 @@ function Profile() {
                         </div>
 
 
-                    </div>
+                    </section>
 
 
                     {/* ACCOUNT INFO */}
 
-                    <div className="profile-account-note">
+                    <aside
+                        className="profile-account-note"
+                        aria-label="Account information notice"
+                    >
 
-                        <CalendarDays size={20} />
+                        <CalendarDays
+                            size={20}
+                            aria-hidden="true"
+                        />
 
                         <span>
                             Your account information is securely
                             retrieved from your SalesSavvy account.
                         </span>
 
-                    </div>
+                    </aside>
 
 
                 </div>
 
-            </div>
+            </main>
         </>
     );
 }

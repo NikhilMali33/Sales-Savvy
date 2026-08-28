@@ -13,11 +13,6 @@ const Orders = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-
-    // ============================================================
-    // LOAD ORDERS
-    // ============================================================
-
     useEffect(() => {
 
         const fetchOrders = async () => {
@@ -55,31 +50,25 @@ const Orders = () => {
     }, []);
 
 
-    // ============================================================
-    // LOADING
-    // ============================================================
-
     if (loading) {
 
         return (
             <>
                 <Navbar />
 
-                <div className="orders-page">
-
-                    <div className="orders-loading">
+                <main className="orders-page">
+                    <div
+                        className="orders-loading"
+                        role="status"
+                        aria-live="polite"
+                    >
                         Loading your orders...
                     </div>
-
-                </div>
+                </main>
             </>
         );
     }
 
-
-    // ============================================================
-    // ERROR
-    // ============================================================
 
     if (error) {
 
@@ -87,21 +76,19 @@ const Orders = () => {
             <>
                 <Navbar />
 
-                <div className="orders-page">
-
-                    <div className="orders-error">
+                <main className="orders-page">
+                    <div
+                        className="orders-error"
+                        role="alert"
+                        aria-live="assertive"
+                    >
                         {error}
                     </div>
-
-                </div>
+                </main>
             </>
         );
     }
 
-
-    // ============================================================
-    // EMPTY ORDERS
-    // ============================================================
 
     if (orders.length === 0) {
 
@@ -109,18 +96,22 @@ const Orders = () => {
             <>
                 <Navbar />
 
-                <div className="orders-page">
+                <main className="orders-page">
 
-                    <div className="empty-orders">
+                    <section
+                        className="empty-orders"
+                        aria-labelledby="empty-orders-heading"
+                    >
 
                         <ShoppingBag
                             size={70}
                             strokeWidth={1.5}
+                            aria-hidden="true"
                         />
 
-                        <h2>
+                        <h1 id="empty-orders-heading">
                             No orders yet
-                        </h2>
+                        </h1>
 
                         <p>
                             Your completed orders will
@@ -134,30 +125,25 @@ const Orders = () => {
                             Start Shopping
                         </Link>
 
-                    </div>
+                    </section>
 
-                </div>
+                </main>
             </>
         );
     }
 
 
-    // ============================================================
-    // ORDERS LIST
-    // ============================================================
-
     return (
         <>
             <Navbar />
 
-            <div className="orders-page">
+            <main className="orders-page">
 
                 <div className="orders-container">
 
-                    <div className="orders-header">
+                    <header className="orders-header">
 
                         <div>
-
                             <h1>
                                 My Orders
                             </h1>
@@ -165,26 +151,29 @@ const Orders = () => {
                             <p>
                                 View and manage your orders
                             </p>
-
                         </div>
 
-                        <Package size={38} />
+                        <Package
+                            size={38}
+                            aria-hidden="true"
+                        />
 
-                    </div>
+                    </header>
 
 
-                    <div className="orders-list">
+                    <section
+                        className="orders-list"
+                        aria-label="Your orders"
+                    >
 
                         {orders.map((order) => (
 
-                            <div
+                            <article
                                 className="order-card"
                                 key={order.orderId}
                             >
 
-                                {/* ORDER HEADER */}
-
-                                <div className="order-card-header">
+                                <header className="order-card-header">
 
                                     <div>
 
@@ -222,10 +211,8 @@ const Orders = () => {
 
                                     </div>
 
-                                </div>
+                                </header>
 
-
-                                {/* ORDER DETAILS */}
 
                                 <div className="order-card-body">
 
@@ -283,25 +270,31 @@ const Orders = () => {
                                     <Link
                                         to={`/orders/${order.orderId}`}
                                         className="view-order-btn"
+                                        aria-label={`View details for order ${order.orderId}`}
                                     >
 
-                                        <Eye size={18} />
+                                        <Eye
+                                            size={18}
+                                            aria-hidden="true"
+                                        />
 
-                                        View Details
+                                        <span>
+                                            View Details
+                                        </span>
 
                                     </Link>
 
                                 </div>
 
-                            </div>
+                            </article>
 
                         ))}
 
-                    </div>
+                    </section>
 
                 </div>
 
-            </div>
+            </main>
         </>
     );
 };

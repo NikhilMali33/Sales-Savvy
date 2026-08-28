@@ -90,32 +90,54 @@ function ProductList() {
 
             <Navbar />
 
-            <SearchBar
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-            />
+            <main id="main-content">
 
-            <CategoryBar
-                categories={categories}
-                onCategoryClick={handleCategoryClick}
-            />
+                <h1 className="products-title">
+                    SalesSavvy Products
+                </h1>
 
-            <h1 className="products-title">SalesSavvy Products</h1>
+                <SearchBar
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                />
 
-            <div className="products-grid">
+                <CategoryBar
+                    categories={categories}
+                    onCategoryClick={handleCategoryClick}
+                />
 
-                {
-                    filteredProducts.map(product => (
+                <section
+                    className="products-grid"
+                    aria-label="Available products"
+                >
 
-                        <ProductCard
-                            key={product.productId}
-                            product={product}
-                        />
+                    {
+                        filteredProducts.length > 0 ? (
 
-                    ))
-                }
+                            filteredProducts.map(product => (
 
-            </div>
+                                <ProductCard
+                                    key={product.productId}
+                                    product={product}
+                                />
+
+                            ))
+
+                        ) : (
+
+                            <p
+                                className="no-products"
+                                role="status"
+                            >
+                                No products found.
+                            </p>
+
+                        )
+                    }
+
+                </section>
+
+            </main>
 
         </div>
 
