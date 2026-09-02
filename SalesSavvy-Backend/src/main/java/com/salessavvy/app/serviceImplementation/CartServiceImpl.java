@@ -17,6 +17,7 @@ import com.salessavvy.app.entities.CartItem;
 import com.salessavvy.app.entities.Product;
 import com.salessavvy.app.entities.ProductImage;
 import com.salessavvy.app.entities.User;
+import com.salessavvy.app.exception.InsufficientStockException;
 import com.salessavvy.app.repositories.CartItemRepository;
 import com.salessavvy.app.repositories.ProductRepository;
 import com.salessavvy.app.repositories.UserRepository;
@@ -95,6 +96,7 @@ public class CartServiceImpl implements CartService {
         User user = getLoggedInUser();
 
         if (request.getProductId() == null) {
+
             throw new RuntimeException(
                     "Product ID is required");
         }
@@ -136,7 +138,7 @@ public class CartServiceImpl implements CartService {
         }
 
 
-        // Check existing cart item
+        // Find existing cart item
 
         CartItem cartItem =
                 cartItemRepository
@@ -150,6 +152,8 @@ public class CartServiceImpl implements CartService {
                 request.getQuantity();
 
 
+        // Existing cart item
+
         if (cartItem != null) {
 
             int newQuantity =
@@ -158,7 +162,7 @@ public class CartServiceImpl implements CartService {
 
             if (newQuantity > product.getStock()) {
 
-                throw new RuntimeException(
+                throw new InsufficientStockException(
                         "Requested quantity exceeds available stock");
             }
 
@@ -168,14 +172,16 @@ public class CartServiceImpl implements CartService {
 
             if (requestedQuantity > product.getStock()) {
 
-                throw new RuntimeException(
+                throw new InsufficientStockException(
                         "Requested quantity exceeds available stock");
             }
 
             cartItem = new CartItem();
 
             cartItem.setUser(user);
+
             cartItem.setProduct(product);
+
             cartItem.setQuantity(requestedQuantity);
         }
 
@@ -193,7 +199,7 @@ public class CartServiceImpl implements CartService {
 
 
     // ============================================================
-    // UPDATE CART ITEM
+    // UPDATE CART ITEM QUANTITY
     // ============================================================
 
     @Override
@@ -225,6 +231,8 @@ public class CartServiceImpl implements CartService {
                 cartItem.getProduct();
 
 
+        // Check product status
+
         if (product.getStatus() == null ||
                 !product.getStatus().name().equals("ACTIVE")) {
 
@@ -233,10 +241,12 @@ public class CartServiceImpl implements CartService {
         }
 
 
+        // Check stock
+
         if (request.getQuantity() >
                 product.getStock()) {
 
-            throw new RuntimeException(
+            throw new InsufficientStockException(
                     "Requested quantity exceeds available stock");
         }
 

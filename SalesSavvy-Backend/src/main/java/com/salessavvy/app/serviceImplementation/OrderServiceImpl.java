@@ -19,6 +19,9 @@ import com.salessavvy.app.entities.OrderItem;
 import com.salessavvy.app.entities.Product;
 import com.salessavvy.app.entities.User;
 import com.salessavvy.app.enums.OrderStatus;
+import com.salessavvy.app.exception.InsufficientStockException;
+import com.salessavvy.app.exception.OrderException;
+import com.salessavvy.app.exception.OrderNotFoundException;
 import com.salessavvy.app.repositories.CartItemRepository;
 import com.salessavvy.app.repositories.OrderRepository;
 import com.salessavvy.app.repositories.ProductRepository;
@@ -34,7 +37,6 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-
     // CONSTRUCTOR
     public OrderServiceImpl(
             OrderRepository orderRepository,
@@ -48,15 +50,14 @@ public class OrderServiceImpl implements OrderService {
         this.productRepository = productRepository;
     }
 
-
     // GET LOGGED-IN USER
     private User getLoggedInUser() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-
-            throw new RuntimeException("User is not authenticated");
+            throw new OrderException("User is not authenticated");
         }
 
         String username = authentication.getName();
@@ -64,10 +65,8 @@ public class OrderServiceImpl implements OrderService {
         return userRepository
                 .findByUsername(username)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Logged-in user not found"));
+                        new OrderException("Logged-in user not found"));
     }
-
 
     // CREATE ORDER FROM CART
     @Override
@@ -75,10 +74,12 @@ public class OrderServiceImpl implements OrderService {
 
         User user = getLoggedInUser();
 
-        List<CartItem> cartItems = cartItemRepository.findByUser(user);
+        List<CartItem> cartItems =
+                cartItemRepository.findByUser(user);
 
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cannot create order because cart is empty");
+            throw new OrderException(
+                    "Cannot create order because cart is empty");
         }
 
         BigDecimal orderTotal = BigDecimal.ZERO;
@@ -90,92 +91,92 @@ public class OrderServiceImpl implements OrderService {
 
             Product product = cartItem.getProduct();
 
-
             // Check product status
-            if (product.getStatus() == null || !product.getStatus().name().equals("ACTIVE")) {
+            if (product.getStatus() == null ||
+                    !product.getStatus().name().equals("ACTIVE")) {
 
-                throw new RuntimeException("Product is currently unavailable: " + product.getName());
+                throw new OrderException(
+                        "Product is currently unavailable: "
+                                + product.getName());
             }
-
 
             // Check stock
-            if (product.getStock() == null || product.getStock() <= 0) {
+            if (product.getStock() == null ||
+                    product.getStock() <= 0) {
 
-                throw new RuntimeException("Product is out of stock: " + product.getName());
+                throw new InsufficientStockException(
+                        "Product is out of stock: "
+                                + product.getName());
             }
-
 
             // Check requested quantity
             if (cartItem.getQuantity() > product.getStock()) {
 
-                throw new RuntimeException("Insufficient stock for product: " + product.getName());
+                throw new InsufficientStockException(
+                        "Insufficient stock for product: "
+                                + product.getName());
             }
-
 
             // Determine effective price
             BigDecimal effectivePrice = product.getPrice();
 
             if (product.getDiscountPrice() != null &&
-                    product.getDiscountPrice().compareTo(product.getPrice()) < 0) {
+                    product.getDiscountPrice()
+                            .compareTo(product.getPrice()) < 0) {
 
                 effectivePrice = product.getDiscountPrice();
             }
 
-
             // Calculate item total
-            BigDecimal itemTotal = effectivePrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
-
+            BigDecimal itemTotal =
+                    effectivePrice.multiply(
+                            BigDecimal.valueOf(
+                                    cartItem.getQuantity()));
 
             // Create OrderItem
             OrderItem orderItem = new OrderItem();
 
             orderItem.setProduct(product);
-
             orderItem.setQuantity(cartItem.getQuantity());
-
             orderItem.setPricePerUnit(effectivePrice);
-
             orderItem.setTotalPrice(itemTotal);
 
             orderItems.add(orderItem);
-
 
             // Add to order total
             orderTotal = orderTotal.add(itemTotal);
         }
 
-
         // CREATE ORDER
-        String orderId = "SS-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        String orderId =
+                "SS-" +
+                UUID.randomUUID()
+                        .toString()
+                        .substring(0, 8)
+                        .toUpperCase();
 
         Order order = new Order();
 
         order.setOrderId(orderId);
-
         order.setUser(user);
-
         order.setTotalAmount(orderTotal);
-
 
         // Order lifecycle starts at PLACED
         order.setStatus(OrderStatus.PLACED);
 
         // CONNECT ORDER ITEMS TO ORDER
         for (OrderItem orderItem : orderItems) {
-
             orderItem.setOrder(order);
         }
 
         order.setOrderItems(orderItems);
 
-
         // SAVE ORDER
         Order savedOrder = orderRepository.save(order);
-        
+
         // RETURN RESPONSE
         return mapToResponseDTO(savedOrder);
     }
-
 
     // GET MY ORDERS
     @Override
@@ -184,18 +185,19 @@ public class OrderServiceImpl implements OrderService {
 
         User user = getLoggedInUser();
 
-        List<Order> orders = orderRepository.findByUserOrderByCreatedAtDesc(user);
+        List<Order> orders =
+                orderRepository
+                        .findByUserOrderByCreatedAtDesc(user);
 
-        List<OrderResponseDTO> response = new ArrayList<>();
+        List<OrderResponseDTO> response =
+                new ArrayList<>();
 
         for (Order order : orders) {
-
             response.add(mapToResponseDTO(order));
         }
 
         return response;
     }
-
 
     // GET SINGLE ORDER
     @Override
@@ -204,24 +206,23 @@ public class OrderServiceImpl implements OrderService {
 
         User user = getLoggedInUser();
 
-        Order order = orderRepository
+        Order order =
+                orderRepository
                         .findByOrderIdAndUser(
                                 orderId,
                                 user)
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new OrderNotFoundException(
                                         "Order not found"));
 
         return mapToResponseDTO(order);
     }
-
 
     // CANCEL ORDER
     @Override
     public void cancelOrder(String orderId) {
 
         User user = getLoggedInUser();
-
 
         // Find order
         Order order =
@@ -230,45 +231,38 @@ public class OrderServiceImpl implements OrderService {
                                 orderId,
                                 user)
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new OrderNotFoundException(
                                         "Order not found"));
-
 
         // Only PLACED orders can be cancelled
         if (order.getStatus() != OrderStatus.PLACED) {
 
-            throw new RuntimeException("Order cannot be cancelled at this stage");
+            throw new OrderException(
+                    "Order cannot be cancelled at this stage");
         }
 
-
-       
         // MARK ORDER AS CANCELLED
         order.setStatus(OrderStatus.CANCELLED);
 
         orderRepository.save(order);
     }
 
-
     // MAP ORDER -> RESPONSE DTO
     private OrderResponseDTO mapToResponseDTO(Order order) {
 
-        OrderResponseDTO dto = new OrderResponseDTO();
-
+        OrderResponseDTO dto =
+                new OrderResponseDTO();
 
         // Basic order information
         dto.setOrderId(order.getOrderId());
-
         dto.setTotalAmount(order.getTotalAmount());
-
         dto.setStatus(order.getStatus());
-
         dto.setPaymentStatus(order.getPaymentStatus());
-
         dto.setCreatedAt(order.getCreatedAt());
 
-
         // ORDER ITEMS
-        List<OrderItemResponseDTO> itemResponses = new ArrayList<>();
+        List<OrderItemResponseDTO> itemResponses =
+                new ArrayList<>();
 
         if (order.getOrderItems() != null) {
 
@@ -278,26 +272,22 @@ public class OrderServiceImpl implements OrderService {
                 OrderItemResponseDTO itemDTO =
                         new OrderItemResponseDTO();
 
-
                 itemDTO.setId(item.getId());
-
-                itemDTO.setProductId(item.getProduct().getProductId());
-
-                itemDTO.setProductName(item.getProduct().getName());
-
+                itemDTO.setProductId(
+                        item.getProduct().getProductId());
+                itemDTO.setProductName(
+                        item.getProduct().getName());
                 itemDTO.setQuantity(item.getQuantity());
-
-                itemDTO.setPricePerUnit(item.getPricePerUnit());
-
-                itemDTO.setTotalPrice(item.getTotalPrice());
+                itemDTO.setPricePerUnit(
+                        item.getPricePerUnit());
+                itemDTO.setTotalPrice(
+                        item.getTotalPrice());
 
                 itemResponses.add(itemDTO);
             }
         }
 
-
         dto.setItems(itemResponses);
-
 
         return dto;
     }

@@ -27,10 +27,7 @@ public class CartController {
     }
 
 
-    // ============================================================
     // GET CART
-    // ============================================================
-
     @GetMapping
     public ResponseEntity<CartResponseDTO> getCart() {
 
@@ -40,10 +37,7 @@ public class CartController {
     }
 
 
-    // ============================================================
     // ADD PRODUCT TO CART
-    // ============================================================
-
     @PostMapping("/add")
     public ResponseEntity<CartResponseDTO> addToCart(
             @RequestBody AddToCartRequest request) {
@@ -55,10 +49,7 @@ public class CartController {
     }
 
 
-    // ============================================================
     // UPDATE CART ITEM QUANTITY
-    // ============================================================
-
     @PutMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponseDTO> updateCartItem(
             @PathVariable Integer cartItemId,
@@ -73,10 +64,7 @@ public class CartController {
     }
 
 
-    // ============================================================
     // REMOVE CART ITEM
-    // ============================================================
-
     @DeleteMapping("/items/{cartItemId}")
     public ResponseEntity<String> removeCartItem(
             @PathVariable Integer cartItemId) {
@@ -89,10 +77,7 @@ public class CartController {
     }
 
 
-    // ============================================================
     // CLEAR CART
-    // ============================================================
-
     @DeleteMapping
     public ResponseEntity<String> clearCart() {
 
