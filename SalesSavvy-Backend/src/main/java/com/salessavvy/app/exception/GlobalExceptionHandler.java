@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -73,29 +74,39 @@ public class GlobalExceptionHandler {
     }
 
 
+    // VALIDATION FAILURES (@Valid on @RequestBody)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleValidationErrors(
+            MethodArgumentNotValidException ex) {
+
+        Map<String, Object> error = buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "Validation failed");
+
+        Map<String, String> fieldErrors = new HashMap<>();
+
+        ex.getBindingResult().getFieldErrors().forEach(fe ->
+                fieldErrors.put(fe.getField(), fe.getDefaultMessage()));
+
+        error.put("fieldErrors", fieldErrors);
+
+        return error;
+    }
+
+
     // COMMON ERROR RESPONSE
-    private Map<String, Object> buildErrorResponse(
-            HttpStatus status,
-            String message) {
+    private Map<String, Object> buildErrorResponse(HttpStatus status, String message) {
 
-        Map<String, Object> error =
-                new HashMap<>();
+        Map<String, Object> error = new HashMap<>();
 
-        error.put(
-                "timestamp",
-                LocalDateTime.now());
+        error.put("timestamp", LocalDateTime.now());
 
-        error.put(
-                "status",
-                status.value());
+        error.put("status", status.value());
 
-        error.put(
-                "error",
-                status.getReasonPhrase());
+        error.put("error", status.getReasonPhrase());
 
-        error.put(
-                "message",
-                message);
+        error.put("message", message);
 
         return error;
     }

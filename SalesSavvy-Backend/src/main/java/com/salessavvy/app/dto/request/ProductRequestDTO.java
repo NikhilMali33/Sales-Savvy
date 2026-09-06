@@ -7,26 +7,39 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.salessavvy.app.enums.ProductStatus;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class ProductRequestDTO {
 
+	@NotBlank(message = "Product name is required")
 	private String productName;
 
 	private String description;
 
+	@NotNull(message = "Price is required")
+	@DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
 	private BigDecimal price;
 
+	@DecimalMin(value = "0.0", message = "Discount price cannot be negative")
 	private BigDecimal discountPrice;
 
+	@NotNull(message = "Stock is required")
+	@Min(value = 0, message = "Stock cannot be negative")
 	private Integer stock;
 
 	private String brand;
 
+	@NotBlank(message = "SKU is required")
 	private String sku;
 
 	private String specifications;
 
 	private String keywords;
 
+	@NotNull(message = "Category is required")
 	private Integer categoryId;
 
 	private ProductStatus status;
@@ -150,8 +163,5 @@ public class ProductRequestDTO {
 	public void setImages(List<MultipartFile> images) {
 		this.images = images;
 	}
-	
-	
-	
 	
 }
