@@ -2,6 +2,8 @@ package com.salessavvy.app.config;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +21,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+	
+	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final AuthServiceImpl authServiceImpl;
 
@@ -65,24 +69,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getJwtFromCookie(
             HttpServletRequest request) {
 
-        if (request.getCookies() == null) {
-            System.out.println(
-                    "JWT COOKIE -> NO COOKIES RECEIVED"
-            );
-            return null;
-        }
+    	if (request.getCookies() == null) {
+    	    logger.debug("No cookies received on request");
+    	    return null;
+    	}
 
-        for (Cookie cookie : request.getCookies()) {
+    	for (Cookie cookie : request.getCookies()) {
 
-            System.out.println(
-                    "COOKIE RECEIVED -> "
-                            + cookie.getName()
-            );
+    	    logger.debug("Cookie received: {}", cookie.getName());
 
-            if ("jwt".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
+    	    if ("jwt".equals(cookie.getName())) {
+    	        return cookie.getValue();
+    	    }
+    	}
 
         return null;
     }
