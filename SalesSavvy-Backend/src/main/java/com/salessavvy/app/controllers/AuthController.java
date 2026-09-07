@@ -21,6 +21,8 @@ import com.salessavvy.app.dto.request.VerifyResetOtpRequest;
 import com.salessavvy.app.dto.response.LoginResponseDTO;
 import com.salessavvy.app.services.AuthService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequestMapping("/api/auth")
@@ -33,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
 
         try {
 
@@ -56,7 +58,7 @@ public class AuthController {
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOtp(@RequestBody OtpRequestDTO request) {
+    public ResponseEntity<?> verifyOtp(@Valid @RequestBody OtpRequestDTO request) {
 
         try {
 
@@ -91,7 +93,7 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
 
         String message = authService.forgotPassword(request.getEmail());
 
@@ -101,7 +103,7 @@ public class AuthController {
     }
 
     @PostMapping("/verify-reset-otp")
-    public ResponseEntity<?> verifyResetOtp(@RequestBody VerifyResetOtpRequest request) {
+    public ResponseEntity<?> verifyResetOtp(@Valid @RequestBody VerifyResetOtpRequest request) {
 
         String message = authService.verifyResetOtp(
                 request.getEmail(),
@@ -113,7 +115,7 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
 
         String message = authService.resetPassword(
                 request.getEmail(),

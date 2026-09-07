@@ -12,6 +12,8 @@ import com.salessavvy.app.dto.request.ProductRequestDTO;
 import com.salessavvy.app.dto.response.ProductResponseDTO;
 import com.salessavvy.app.services.AdminProductService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/admin/products")
 public class AdminProductController {
@@ -23,7 +25,7 @@ public class AdminProductController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ProductResponseDTO> addProduct(@ModelAttribute ProductRequestDTO request)
+    public ResponseEntity<ProductResponseDTO> addProduct(@Valid @ModelAttribute ProductRequestDTO request)
             throws IOException {
 
         return ResponseEntity.ok(adminProductService.addProduct(request));
@@ -43,7 +45,7 @@ public class AdminProductController {
     }
 
     @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ProductResponseDTO updateProduct(@PathVariable Integer productId, @ModelAttribute ProductRequestDTO request)
+    public ProductResponseDTO updateProduct(@PathVariable Integer productId,@Valid @ModelAttribute ProductRequestDTO request)
             throws IOException {
 
         return adminProductService.updateProduct(productId, request);

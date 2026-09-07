@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.salessavvy.app.dto.response.AdminOrderResponseDTO;
 import com.salessavvy.app.services.AdminOrderService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/admin/orders")
 public class AdminOrderController {

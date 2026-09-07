@@ -19,6 +19,8 @@ import com.salessavvy.app.entities.User;
 import com.salessavvy.app.enums.Role;
 import com.salessavvy.app.services.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @CrossOrigin(
         origins = "http://localhost:5173",
@@ -37,8 +39,7 @@ public class UserController {
 
     // PUBLIC CUSTOMER REGISTRATION
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(
-            @RequestBody User user) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody User user) {
 
         try {
 
@@ -68,7 +69,7 @@ public class UserController {
 
     // ADMIN CREATE USER
     @PostMapping("/admin/create")
-    public ResponseEntity<?> createUserByAdmin(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<?> createUserByAdmin(@Valid @RequestBody CreateUserRequest request) {
 
         try {
 

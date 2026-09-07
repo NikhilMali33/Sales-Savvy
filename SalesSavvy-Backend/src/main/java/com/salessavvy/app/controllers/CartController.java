@@ -16,6 +16,8 @@ import com.salessavvy.app.dto.request.UpdateCartItemRequest;
 import com.salessavvy.app.dto.response.CartResponseDTO;
 import com.salessavvy.app.services.CartService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
@@ -39,8 +41,7 @@ public class CartController {
 
     // ADD PRODUCT TO CART
     @PostMapping("/add")
-    public ResponseEntity<CartResponseDTO> addToCart(
-            @RequestBody AddToCartRequest request) {
+    public ResponseEntity<CartResponseDTO> addToCart(@Valid @RequestBody AddToCartRequest request) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
@@ -53,7 +54,7 @@ public class CartController {
     @PutMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponseDTO> updateCartItem(
             @PathVariable Integer cartItemId,
-            @RequestBody UpdateCartItemRequest request) {
+            @Valid @RequestBody UpdateCartItemRequest request) {
 
         return ResponseEntity.ok(
                 cartService.updateCartItem(

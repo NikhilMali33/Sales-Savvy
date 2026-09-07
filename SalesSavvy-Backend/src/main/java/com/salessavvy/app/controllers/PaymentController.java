@@ -11,6 +11,8 @@ import com.salessavvy.app.dto.request.VerifyPaymentRequest;
 import com.salessavvy.app.dto.response.PaymentOrderResponseDTO;
 import com.salessavvy.app.services.PaymentService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
@@ -21,10 +23,7 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    // ============================================================
     // CREATE RAZORPAY ORDER
-    // ============================================================
-
     @PostMapping("/create-order/{orderId}")
     public ResponseEntity<PaymentOrderResponseDTO> createPaymentOrder(
             @PathVariable String orderId) {
@@ -38,7 +37,7 @@ public class PaymentController {
     
     @PostMapping("/verify")
     public ResponseEntity<String> verifyPayment(
-            @RequestBody VerifyPaymentRequest request) {
+    		@Valid  @RequestBody VerifyPaymentRequest request) {
 
         paymentService.verifyPayment(
                 request.getOrderId(),
