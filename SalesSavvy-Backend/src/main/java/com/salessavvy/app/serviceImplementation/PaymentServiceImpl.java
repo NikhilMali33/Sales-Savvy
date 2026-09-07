@@ -3,6 +3,9 @@ package com.salessavvy.app.serviceImplementation;
 import java.math.BigDecimal;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,12 +33,20 @@ import com.salessavvy.app.services.PaymentService;
 @Service
 @Transactional
 public class PaymentServiceImpl implements PaymentService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     private final RazorpayClient razorpayClient;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
+    
+    @Value("${razorpay.key.id}")
+    private String razorpayKeyId;
+
+    @Value("${razorpay.key.secret}")
+    private String razorpayKeySecret;
 
     // CONSTRUCTOR
     public PaymentServiceImpl(
@@ -55,13 +66,9 @@ public class PaymentServiceImpl implements PaymentService {
     // GET LOGGED-IN USER
     private User getLoggedInUser() {
 
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null ||
-                !authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated()) {
 
             throw new PaymentException(
                     "User is not authenticated");
@@ -78,8 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     // CREATE RAZORPAY ORDER
     @Override
-    public PaymentOrderResponseDTO createRazorpayOrder(
-            String orderId) {
+    public PaymentOrderResponseDTO createRazorpayOrder(String orderId) {
 
         try {
 
@@ -98,11 +104,9 @@ public class PaymentServiceImpl implements PaymentService {
 
             // Check payment status
             if (salesSavvyOrder.getPaymentStatus() != null &&
-                    salesSavvyOrder.getPaymentStatus()
-                            == PaymentStatus.SUCCESS) {
+                    salesSavvyOrder.getPaymentStatus() == PaymentStatus.SUCCESS) {
 
-                throw new PaymentException(
-                        "Payment has already been completed");
+                throw new PaymentException("Payment has already been completed");
             }
 
             // Reuse existing Razorpay order
@@ -111,22 +115,14 @@ public class PaymentServiceImpl implements PaymentService {
                             .getRazorpayOrderId()
                             .isBlank()) {
 
-                BigDecimal totalAmount =
-                        salesSavvyOrder.getTotalAmount();
+                BigDecimal totalAmount = salesSavvyOrder.getTotalAmount();
 
-                if (totalAmount == null ||
-                        totalAmount.compareTo(
-                                BigDecimal.ZERO) <= 0) {
+                if (totalAmount == null || totalAmount.compareTo(BigDecimal.ZERO) <= 0) {
 
-                    throw new PaymentException(
-                            "Invalid order amount");
+                    throw new PaymentException("Invalid order amount");
                 }
 
-                long amountInPaise =
-                        totalAmount
-                                .multiply(
-                                        BigDecimal.valueOf(100))
-                                .longValueExact();
+                long amountInPaise = totalAmount.multiply(BigDecimal.valueOf(100)).longValueExact();
 
                 return new PaymentOrderResponseDTO(
                         salesSavvyOrder.getOrderId(),
@@ -137,63 +133,43 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             // Validate amount
-            BigDecimal totalAmount =
-                    salesSavvyOrder.getTotalAmount();
+            BigDecimal totalAmount = salesSavvyOrder.getTotalAmount();
 
-            if (totalAmount == null ||
-                    totalAmount.compareTo(
-                            BigDecimal.ZERO) <= 0) {
+            if (totalAmount == null || totalAmount.compareTo(BigDecimal.ZERO) <= 0) {
 
-                throw new PaymentException(
-                        "Invalid order amount");
+                throw new PaymentException("Invalid order amount");
             }
 
             // Convert INR to paise
-            long amountInPaise =
-                    totalAmount
-                            .multiply(
-                                    BigDecimal.valueOf(100))
-                            .longValueExact();
+            long amountInPaise = totalAmount.multiply(BigDecimal.valueOf(100)).longValueExact();
 
             // Create Razorpay order request
-            JSONObject orderRequest =
-                    new JSONObject();
+            JSONObject orderRequest = new JSONObject();
 
-            orderRequest.put(
-                    "amount",
-                    amountInPaise);
+            orderRequest.put("amount", amountInPaise);
 
-            orderRequest.put(
-                    "currency",
-                    "INR");
+            orderRequest.put("currency", "INR");
 
-            orderRequest.put(
-                    "receipt",
-                    salesSavvyOrder.getOrderId());
+            orderRequest.put("receipt", salesSavvyOrder.getOrderId());
 
             // Create Razorpay order
-            Order razorpayOrder =
-                    razorpayClient.orders
-                            .create(orderRequest);
+            Order razorpayOrder = razorpayClient.orders.create(orderRequest);
 
             // Get Razorpay Order ID
-            String razorpayOrderId =
-                    razorpayOrder.get("id");
+            String razorpayOrderId = razorpayOrder.get("id");
 
-            if (razorpayOrderId == null ||
-                    razorpayOrderId.isBlank()) {
+            if (razorpayOrderId == null || razorpayOrderId.isBlank()) {
 
-                throw new PaymentException(
-                        "Failed to generate Razorpay order ID");
+                throw new PaymentException("Failed to generate Razorpay order ID");
             }
 
             // SAVE RAZORPAY ORDER ID
-            salesSavvyOrder
-                    .setRazorpayOrderId(
-                            razorpayOrderId);
+            salesSavvyOrder.setRazorpayOrderId(razorpayOrderId);
 
-            orderRepository.save(
-                    salesSavvyOrder);
+            orderRepository.save(salesSavvyOrder);
+            
+            logger.info("Razorpay order created successfully: orderId={}, razorpayOrderId={}",
+                    salesSavvyOrder.getOrderId(), razorpayOrderId);
 
             // Return response
             return new PaymentOrderResponseDTO(
@@ -203,19 +179,17 @@ public class PaymentServiceImpl implements PaymentService {
                     amountInPaise,
                     "INR");
 
-        } catch (
-                PaymentException |
-                OrderNotFoundException e) {
+        } catch (PaymentException |  OrderNotFoundException e) {
 
             // Preserve our domain exceptions
             throw e;
 
         } catch (Exception e) {
+        	
+        	logger.error("Failed to create Razorpay order for orderId={}: {}", orderId, e.getMessage(), e);
 
             // Convert unexpected Razorpay/system errors
-            throw new PaymentException(
-                    "Failed to create Razorpay order",
-                    e);
+            throw new PaymentException("Failed to create Razorpay order", e);
         }
     }
 
@@ -243,37 +217,27 @@ public class PaymentServiceImpl implements PaymentService {
                                             "Order not found"));
 
             // Check if payment is already successful
-            if (salesSavvyOrder.getPaymentStatus()
-                    == PaymentStatus.SUCCESS) {
+            if (salesSavvyOrder.getPaymentStatus() == PaymentStatus.SUCCESS) {
 
-                throw new PaymentException(
-                        "Payment has already been verified");
+                throw new PaymentException("Payment has already been verified");
             }
 
             // Validate Razorpay Order ID
-            if (salesSavvyOrder.getRazorpayOrderId() == null ||
-                    !salesSavvyOrder
-                            .getRazorpayOrderId()
-                            .equals(razorpayOrderId)) {
+            if (salesSavvyOrder.getRazorpayOrderId() == null || !salesSavvyOrder.getRazorpayOrderId().equals(razorpayOrderId)) {
 
-                throw new PaymentException(
-                        "Invalid Razorpay order ID");
+                throw new PaymentException("Invalid Razorpay order ID");
             }
 
             // Validate Payment ID
-            if (razorpayPaymentId == null ||
-                    razorpayPaymentId.isBlank()) {
+            if (razorpayPaymentId == null || razorpayPaymentId.isBlank()) {
 
-                throw new PaymentException(
-                        "Razorpay payment ID is missing");
+                throw new PaymentException("Razorpay payment ID is missing");
             }
 
             // Validate Signature
-            if (razorpaySignature == null ||
-                    razorpaySignature.isBlank()) {
+            if (razorpaySignature == null || razorpaySignature.isBlank()) {
 
-                throw new PaymentException(
-                        "Razorpay signature is missing");
+                throw new PaymentException("Razorpay signature is missing");
             }
 
             // Verify Razorpay Signature
@@ -281,96 +245,65 @@ public class PaymentServiceImpl implements PaymentService {
 
             if (secret == null || secret.isBlank()) {
 
-                throw new PaymentException(
-                        "Razorpay secret is not configured");
+                throw new PaymentException("Razorpay secret is not configured");
             }
 
-            JSONObject attributes =
-                    new JSONObject();
+            JSONObject attributes = new JSONObject();
 
-            attributes.put(
-                    "razorpay_order_id",
-                    razorpayOrderId);
+            attributes.put("razorpay_order_id", razorpayOrderId);
 
-            attributes.put(
-                    "razorpay_payment_id",
-                    razorpayPaymentId);
+            attributes.put("razorpay_payment_id", razorpayPaymentId);
 
-            attributes.put(
-                    "razorpay_signature",
-                    razorpaySignature);
+            attributes.put("razorpay_signature", razorpaySignature);
 
-            boolean signatureValid =
-                    Utils.verifyPaymentSignature(
-                            attributes,
-                            secret);
+            boolean signatureValid = Utils.verifyPaymentSignature(attributes, secret);
 
             // PAYMENT FAILED
             if (!signatureValid) {
 
-                salesSavvyOrder.setPaymentStatus(
-                        PaymentStatus.FAILED);
+                salesSavvyOrder.setPaymentStatus(PaymentStatus.FAILED);
 
-                orderRepository.save(
-                        salesSavvyOrder);
+                orderRepository.save(salesSavvyOrder);
+                
+                logger.warn("Payment signature verification failed: orderId={}, razorpayOrderId={}, razorpayPaymentId={}",
+                        orderId, razorpayOrderId, razorpayPaymentId);
 
-                throw new PaymentException(
-                        "Invalid Razorpay payment signature");
+                throw new PaymentException("Invalid Razorpay payment signature");
             }
 
             // PAYMENT SUCCESS
-            if (salesSavvyOrder.getOrderItems() == null ||
-                    salesSavvyOrder
-                            .getOrderItems()
-                            .isEmpty()) {
+            if (salesSavvyOrder.getOrderItems() == null || salesSavvyOrder.getOrderItems().isEmpty()) {
 
-                throw new OrderException(
-                        "Order contains no items");
+                throw new OrderException("Order contains no items");
             }
 
             // Re-check stock for every ordered product
-            for (OrderItem orderItem :
-                    salesSavvyOrder.getOrderItems()) {
+            for (OrderItem orderItem : salesSavvyOrder.getOrderItems()) {
 
-                Product product =
-                        orderItem.getProduct();
+                Product product = orderItem.getProduct();
 
                 if (product == null) {
 
-                    throw new OrderException(
-                            "Product not found for order item");
+                    throw new OrderException("Product not found for order item");
                 }
 
-                if (product.getStatus() == null ||
-                        !product.getStatus()
-                                .name()
-                                .equals("ACTIVE")) {
+                if (product.getStatus() == null || !product.getStatus().name().equals("ACTIVE")) {
 
-                    throw new OrderException(
-                            "Product is no longer available: "
-                                    + product.getName());
+                    throw new OrderException("Product is no longer available: " + product.getName());
                 }
 
-                if (product.getStock() == null ||
-                        product.getStock()
-                                < orderItem.getQuantity()) {
+                if (product.getStock() == null || product.getStock() < orderItem.getQuantity()) {
 
-                    throw new InsufficientStockException(
-                            "Insufficient stock for product: "
-                                    + product.getName());
+                    throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
                 }
             }
 
             // Reduce stock
-            for (OrderItem orderItem :
-                    salesSavvyOrder.getOrderItems()) {
+            for (OrderItem orderItem : salesSavvyOrder.getOrderItems()) {
 
-                Product product =
-                        orderItem.getProduct();
+                Product product = orderItem.getProduct();
 
-                int newStock =
-                        product.getStock()
-                                - orderItem.getQuantity();
+                int newStock = product.getStock() - orderItem.getQuantity();
 
                 product.setStock(newStock);
 
@@ -378,30 +311,24 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             // Mark payment as successful
-            salesSavvyOrder.setPaymentStatus(
-                    PaymentStatus.SUCCESS);
+            salesSavvyOrder.setPaymentStatus(PaymentStatus.SUCCESS);
 
-            salesSavvyOrder.setStatus(
-                    OrderStatus.CONFIRMED);
+            salesSavvyOrder.setStatus(OrderStatus.CONFIRMED);
 
-            salesSavvyOrder.setRazorpayPaymentId(
-                    razorpayPaymentId);
+            salesSavvyOrder.setRazorpayPaymentId(razorpayPaymentId);
 
             // Save updated order
-            orderRepository.save(
-                    salesSavvyOrder);
+            orderRepository.save(salesSavvyOrder);
+            
+            logger.info("Payment verified and order confirmed: orderId={}, userId={}, amount={}",
+                    orderId, user.getUserId(), salesSavvyOrder.getTotalAmount());
 
             // Remove ONLY purchased products from cart
-            for (OrderItem orderItem :
-                    salesSavvyOrder.getOrderItems()) {
+            for (OrderItem orderItem : salesSavvyOrder.getOrderItems()) {
 
-                Product product =
-                        orderItem.getProduct();
+                Product product = orderItem.getProduct();
 
-                cartItemRepository
-                        .deleteByUserAndProduct(
-                                user,
-                                product);
+                cartItemRepository.deleteByUserAndProduct(user, product);
             }
 
         } catch (
@@ -414,25 +341,23 @@ public class PaymentServiceImpl implements PaymentService {
             throw e;
 
         } catch (Exception e) {
+        	
+        	logger.error("Payment verification failed for orderId={}: {}", orderId, e.getMessage(), e);
 
             // Convert unexpected Razorpay/system errors
-            throw new PaymentException(
-                    "Payment verification failed",
-                    e);
+            throw new PaymentException("Payment verification failed", e);
         }
     }
 
     // GET RAZORPAY KEY ID
     private String getRazorpayKeyId() {
 
-        return System.getenv(
-                "RAZORPAY_KEY_ID");
+        return razorpayKeyId;
     }
 
     // GET RAZORPAY SECRET
     private String getRazorpayKeySecret() {
 
-        return System.getenv(
-                "RAZORPAY_KEY_SECRET");
+        return razorpayKeySecret;
     }
 }

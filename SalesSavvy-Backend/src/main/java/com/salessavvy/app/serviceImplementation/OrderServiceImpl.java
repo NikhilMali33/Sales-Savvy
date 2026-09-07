@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,8 @@ import com.salessavvy.app.services.OrderService;
 @Service
 @Transactional
 public class OrderServiceImpl implements OrderService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
@@ -173,6 +177,9 @@ public class OrderServiceImpl implements OrderService {
 
         // SAVE ORDER
         Order savedOrder = orderRepository.save(order);
+        
+        logger.info("Order created: orderId={}, userId={}, totalAmount={}, itemCount={}",
+                savedOrder.getOrderId(), user.getUserId(), orderTotal, orderItems.size());
 
         // RETURN RESPONSE
         return mapToResponseDTO(savedOrder);
@@ -245,6 +252,8 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.CANCELLED);
 
         orderRepository.save(order);
+        
+        logger.info("Order cancelled: orderId={}, userId={}", orderId, user.getUserId());
     }
 
     // MAP ORDER -> RESPONSE DTO
